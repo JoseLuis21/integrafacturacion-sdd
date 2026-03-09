@@ -4,9 +4,68 @@
   "table": "users",
   "description": "Authentication and account access for platform users",
   "scope": "control",
-  "permissions": [
-    "auth.me"
-  ],
+  "permissions": ["auth.me"],
+  "authStrategy": {
+    "type": "jwt_refresh",
+    "accessTokenTTLMinutes": 60,
+    "refreshTokenTTLDays": 30,
+    "logoutRevokesRefreshToken": true,
+    "allowConcurrentSessions": true
+  },
+  "tokenPolicies": {
+    "emailVerificationHours": 24,
+    "passwordSetupHours": 72,
+    "passwordResetHours": 1
+  },
+  "passwordPolicy": {
+    "minLength": 8,
+    "requireUppercase": true,
+    "requireLowercase": true,
+    "requireNumber": true,
+    "requireSymbol": true
+  },
+  "statusPolicies": {
+    "invited": {
+      "canLoginWithPassword": false
+    },
+    "active": {
+      "canLoginWithPassword": true
+    },
+    "blocked": {
+      "canLoginWithPassword": false
+    },
+    "pending_email_verification": {
+      "canLoginWithPassword": false
+    }
+  },
+  "membershipPolicy": {
+    "loginRequiresCompanyMembership": false,
+    "tenantAccessRequiresCompanyMembership": true,
+    "allowedCompanyUserStatuses": ["active"]
+  },
+  "middlewareContract": {
+    "locals": ["userID", "sessionID", "email"],
+    "jwtClaims": ["sub", "sid", "eml", "iss", "iat", "exp"]
+  },
+  "securityControls": {
+    "rateLimit": {
+      "login": {
+        "byIP": "10/5m",
+        "byNormalizedEmailFailed": "5/15m"
+      },
+      "forgotPassword": {
+        "byIP": "5/15m",
+        "byNormalizedEmail": "3/30m"
+      }
+    },
+    "storeRawTokens": false,
+    "auditEnabled": true
+  },
+  "mailFlows": {
+    "verifyEmailTemplate": "auth.verify-email",
+    "resetPasswordTemplate": "auth.reset-password",
+    "setPasswordTemplate": "auth.set-password"
+  },
   "fields": [
     {
       "name": "id",
@@ -40,12 +99,7 @@
       "name": "status",
       "type": "enum",
       "required": true,
-      "values": [
-        "invited",
-        "active",
-        "blocked",
-        "pending_email_verification"
-      ]
+      "values": ["invited", "active", "blocked", "pending_email_verification"]
     },
     {
       "name": "firstName",
@@ -138,13 +192,15 @@
   "rules": [
     "email must be normalized before lookup",
     "blocked users cannot login",
-    "users without password set cannot login with password flow",
+    "invited users cannot login with password until password is set",
+    "pending email verification users cannot login with password until email is verified",
     "passwords are stored only as secure hash",
     "verify email token must expire and be one-time use",
     "password setup token must expire and be one-time use",
     "password reset token must expire and be one-time use",
     "login updates last_login_at",
-    "user must belong to at least one company to access tenant data"
+    "login may succeed without company membership, but tenant access requires at least one active company membership",
+    "logout revokes current refresh token/session"
   ],
   "tables": [
     "users",
@@ -152,6 +208,17 @@
     "email_verifications",
     "password_setup_tokens",
     "password_reset_tokens"
+  ],
+  "errors": [
+    { "code": "INVALID_CREDENTIALS", "httpStatus": 401 },
+    { "code": "USER_BLOCKED", "httpStatus": 403 },
+    { "code": "PASSWORD_NOT_SET", "httpStatus": 403 },
+    { "code": "UNAUTHORIZED", "httpStatus": 401 },
+    { "code": "INVALID_CURRENT_PASSWORD", "httpStatus": 422 },
+    { "code": "TOKEN_EXPIRED", "httpStatus": 422 },
+    { "code": "TOKEN_ALREADY_USED", "httpStatus": 422 },
+    { "code": "VALIDATION_ERROR", "httpStatus": 400 },
+    { "code": "RATE_LIMITED", "httpStatus": 429 }
   ],
   "ui": {
     "pages": [

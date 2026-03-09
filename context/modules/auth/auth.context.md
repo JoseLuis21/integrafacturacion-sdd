@@ -28,13 +28,17 @@ Auth handles authentication and account access for platform users.
 
 - Email must be normalized before lookup.
 - Blocked users cannot login.
-- Users without password set cannot login with password flow.
+- Invited users cannot login with password until the first password is set.
+- Pending email verification users cannot login with password until email is verified.
 - Passwords are stored only as secure hashes.
-- Verification and reset tokens must expire.
-- Verification and reset tokens must be one-time use.
-- Login should update last_login_at.
-- Auth module belongs to control DB, not tenant DB.
-- Auth does not grant business access by itself; access still depends on company membership and ACL.
+- Email verification tokens expire in 24 hours and are one-time use.
+- Password setup tokens expire in 72 hours and are one-time use.
+- Password reset tokens expire in 1 hour and are one-time use.
+- Login updates `last_login_at`.
+- Login may succeed without company membership, but tenant access requires at least one active company membership.
+- Authenticated endpoints require middleware to inject `userID` and `sessionID` into request context.
+- Logout revokes the current refresh token/session.
+- Forgot-password must not reveal whether the account exists.
 
 ## Main Endpoints
 
@@ -60,13 +64,20 @@ Auth handles authentication and account access for platform users.
 - token generator
 - mailer
 
+## Session Notes
+
+- Auth uses JWT access tokens plus persisted refresh tokens.
+- Access token ttl: 60 minutes.
+- Refresh token ttl: 30 days.
+
+---
+
 ## Security Notes
 
 - Never store raw passwords.
-- Never store raw reset or verification tokens in DB.
-- Add rate limiting to login and forgot-password.
-- Do not reveal sensitive account existence details in forgot-password flow.
-- Authenticated session is required for /auth/me and /auth/change-password.
+- Never store raw verification, setup, or reset tokens.
+- Apply rate limiting to login and forgot-password.
+- Audit successful and failed login attempts.
 
 ---
 

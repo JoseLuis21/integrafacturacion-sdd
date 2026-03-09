@@ -55,9 +55,11 @@ This module does **not** include:
 # Main Entities
 
 ## User
+
 Represents a platform user account.
 
 Typical fields:
+
 - id
 - email
 - email_normalized
@@ -76,9 +78,11 @@ Typical fields:
 ---
 
 ## CompanyUser
+
 Represents the relationship between a user and a company/workspace.
 
 Typical fields:
+
 - id
 - user_id
 - company_id
@@ -89,9 +93,11 @@ Typical fields:
 ---
 
 ## EmailVerification
+
 Represents verification tokens used to confirm email ownership.
 
 Typical fields:
+
 - id
 - user_id
 - email
@@ -104,9 +110,11 @@ Typical fields:
 ---
 
 ## PasswordSetupToken
+
 Represents one-time tokens used by invited users to set their first password.
 
 Typical fields:
+
 - id
 - user_id
 - token_hash
@@ -117,9 +125,11 @@ Typical fields:
 ---
 
 ## PasswordResetToken
+
 Represents one-time tokens used to reset a password.
 
 Typical fields:
+
 - id
 - user_id
 - token_hash
@@ -177,28 +187,240 @@ Suggested user statuses:
 ### Rules by status
 
 #### invited
+
 - may exist without password set
 - cannot login with password until password is set
 
 #### active
+
 - can login if credentials are valid
 
 #### blocked
+
 - cannot login
 - cannot use password auth flow
 
 #### pending_email_verification
-- may or may not be allowed to login depending on product policy
-- email verification flow remains available
+
+- cannot complete password login until email is verified
+- may request resend verification email
+- may verify email using a valid token
+
+---
+
+# API Endpoints
+
+---
+
+# Session Strategy
+
+Authentication uses:
+
+- short-lived JWT access tokens
+- refresh tokens persisted in the control database
+
+## Rules
+
+- access token is returned by `POST /api/v1/auth/login`
+- refresh token may be returned as an HTTP-only cookie or response field depending on API policy
+- logout invalidates the current refresh token/session
+- access tokens are not persisted server-side
+- multiple concurrent sessions are allowed unless revoked explicitly
+
+## Suggested defaults
+
+- access token ttl: 60 minutes
+- refresh token ttl: 30 days
+
+---
+
+# Auth Middleware Contract
+
+Authenticated endpoints depend on middleware that validates the access token and injects request-scoped auth data.
+
+## Middleware output
+
+The middleware must make available:
+
+- `userID`
+- `sessionID` if refresh/session persistence is used
+- `email`
+- optional `companyID` if tenant context was already selected
+
+## JWT claims
+
+Suggested claims:
+
+- `sub` → user id
+- `sid` → session id
+- `eml` → email
+- `iss` → issuer
+- `iat` → issued at
+- `exp` → expiration
+
+---
+
+# Password Policy
+
+Passwords must satisfy:
+
+- minimum length: 8
+- at least 1 uppercase letter
+- at least 1 lowercase letter
+- at least 1 number
+- at least 1 symbol
+
+Validation errors should return:
+
+- `VALIDATION_ERROR`
+
+---
+
+# Token Policies
+
+## Email verification token
+
+- one-time use
+- expires in 24 hours
+
+## Password setup token
+
+- one-time use
+- expires in 72 hours
+
+## Password reset token
+
+- one-time use
+- expires in 1 hour
+
+## Access token
+
+- expires in 60 minutes
+
+## Refresh token
+
+- expires in 30 days
+- revoked on logout
+
+---
+
+# Company Membership Access Policy
+
+- login may succeed even if the user has zero active company memberships
+- access to tenant-scoped modules requires at least one active company membership
+- only `company_users.status = active` grants tenant access
+- invited or suspended memberships do not grant tenant access
+
+---
+
+# Rate Limiting
+
+Apply rate limiting to:
+
+## POST /api/v1/auth/login
+
+- limit by IP: 10 requests per 5 minutes
+- limit by normalized email: 5 failed attempts per 15 minutes
+
+## POST /api/v1/auth/forgot-password
+
+- limit by IP: 5 requests per 15 minutes
+- limit by normalized email: 3 requests per 30 minutes
+
+Rate-limited responses return:
+
+- HTTP 429
+- code: `RATE_LIMITED`
+
+---
+
+# Audit Rules
+
+Audit these events:
+
+- login_succeeded
+- login_failed
+- logout_succeeded
+- password_reset_requested
+- password_reset_completed
+- password_changed
+- email_verified
+
+Each audit event should include:
+
+- user_id if known
+- normalized email if relevant
+- ip
+- result
+- error_code if failed
+- created_at
+
+---
+
+# Mail Delivery Contract
+
+Auth mail flows:
+
+- email verification
+- password reset
+- invitation password setup
+
+## Required template keys
+
+- `auth.verify-email`
+- `auth.reset-password`
+- `auth.set-password`
+
+## Link format
+
+- verify email: `{frontendBaseURL}/verify-email?token={token}`
+- reset password: `{frontendBaseURL}/reset-password?token={token}`
+- set password: `{frontendBaseURL}/set-password?token={token}`
+
+---
+
+# Error Mapping
+
+| Code                     | HTTP Status | Meaning                                  |
+| ------------------------ | ----------- | ---------------------------------------- |
+| INVALID_CREDENTIALS      | 401         | email/password mismatch                  |
+| USER_BLOCKED             | 403         | blocked user cannot authenticate         |
+| PASSWORD_NOT_SET         | 403         | invited user has no password yet         |
+| UNAUTHORIZED             | 401         | missing or invalid authenticated session |
+| INVALID_CURRENT_PASSWORD | 422         | current password does not match          |
+| TOKEN_EXPIRED            | 422         | token expired                            |
+| TOKEN_ALREADY_USED       | 422         | token already consumed                   |
+| VALIDATION_ERROR         | 400         | invalid input                            |
+| RATE_LIMITED             | 429         | request limit exceeded                   |
+
+---
+
+# Password Setup Token Creation Contract
+
+Password setup tokens are created outside the public auth endpoints.
+
+## Owner
+
+- created by the user invitation flow in the users/company-users module
+
+## Delivery
+
+- delivered by email through the auth mailer contract
+
+## Expiration
+
+- expires in 72 hours
 
 ---
 
 # API Endpoints
 
 ## POST `/api/v1/auth/login`
+
 Authenticate a user with email and password.
 
 ### Request
+
 ```json
 {
   "email": "user@example.com",
@@ -207,6 +429,7 @@ Authenticate a user with email and password.
 ```
 
 ### Response
+
 ```json
 {
   "success": true,
@@ -230,20 +453,25 @@ Authenticate a user with email and password.
 ---
 
 ## POST `/api/v1/auth/logout`
+
 Invalidate the current authenticated session.
 
 ### Auth required
+
 Yes
 
 ---
 
 ## GET `/api/v1/auth/me`
+
 Return the current authenticated user profile.
 
 ### Auth required
+
 Yes
 
 ### Response
+
 ```json
 {
   "success": true,
@@ -267,9 +495,11 @@ Yes
 ---
 
 ## POST `/api/v1/auth/verify-email`
+
 Verify an email token.
 
 ### Request
+
 ```json
 {
   "token": "raw-token"
@@ -279,9 +509,11 @@ Verify an email token.
 ---
 
 ## POST `/api/v1/auth/resend-verify-email`
+
 Resend a verification email.
 
 ### Request
+
 ```json
 {
   "email": "user@example.com"
@@ -291,9 +523,11 @@ Resend a verification email.
 ---
 
 ## POST `/api/v1/auth/set-password`
+
 Set the first password for an invited user.
 
 ### Request
+
 ```json
 {
   "token": "raw-token",
@@ -305,9 +539,11 @@ Set the first password for an invited user.
 ---
 
 ## POST `/api/v1/auth/forgot-password`
+
 Request a password reset.
 
 ### Request
+
 ```json
 {
   "email": "user@example.com"
@@ -317,9 +553,11 @@ Request a password reset.
 ---
 
 ## POST `/api/v1/auth/reset-password`
+
 Reset a password using a valid token.
 
 ### Request
+
 ```json
 {
   "token": "raw-token",
@@ -331,12 +569,15 @@ Reset a password using a valid token.
 ---
 
 ## POST `/api/v1/auth/change-password`
+
 Change password for the current authenticated user.
 
 ### Auth required
+
 Yes
 
 ### Request
+
 ```json
 {
   "currentPassword": "OldSecret123!",
@@ -362,6 +603,7 @@ Authenticated profile access can use:
 - `auth.me`
 
 Other user-management permissions belong to other modules, such as:
+
 - `users.read`
 - `users.create`
 - `users.update`
@@ -381,6 +623,7 @@ Tables typically used:
 - `password_reset_tokens`
 
 Optional supporting tables:
+
 - `refresh_tokens`
 - `login_audit_logs`
 
@@ -455,6 +698,7 @@ Suggested frontend pages/components:
 - change password form
 
 Suggested reusable UI pieces:
+
 - login form
 - forgot password form
 - reset password form
@@ -547,7 +791,9 @@ src/modules/auth/
 # Testing Guidelines
 
 ## Backend
+
 Cover at least:
+
 - successful login
 - blocked user login rejection
 - password not set rejection
@@ -562,7 +808,9 @@ Cover at least:
 - invalid current password
 
 ## Frontend
+
 Cover at least:
+
 - login form validation
 - forgot password form validation
 - reset password form validation
@@ -576,6 +824,7 @@ Cover at least:
 Future capabilities should be added through **change specs**, not by silently stretching the module.
 
 Examples:
+
 - Google OAuth
 - MFA
 - magic links
