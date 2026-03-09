@@ -199,6 +199,54 @@ AI should be used with:
 - core context
 - project conventions
 
+---
+
+## Folder Structure
+
+### Project-level Structure
+
+See [Readme.md - Framework Structure](../../Readme.md#framework-structure) for the complete project organization:
+
+- `docs/` → Human-readable documentation
+- `specs/` → Machine-readable JSON specifications
+- `context/` → AI-optimized context files
+- `templates/` → Reusable specification templates
+- `indexes/` → Navigation and discovery
+
+### Backend Module Structure
+
+Each backend module follows hexagonal architecture patterns:
+
+```text
+internal/modules/<module>/
+├── domain/              # Business logic, entities, repository interfaces
+├── application/         # Use cases, DTOs, orchestration
+│   ├── dto/             # Data transfer objects
+│   └── usecases/        # Business logic orchestration
+├── infrastructure/      # HTTP, database, external providers
+│   ├── persistence/postgres/
+│   ├── http/
+│   └── providers/
+└── module.go            # Module registration
+```
+
+### Frontend Module Structure
+
+Each frontend module is organized by domain:
+
+```text
+src/modules/<module>/
+├── components/          # React components
+├── hooks/               # Custom React hooks
+├── services/            # API service clients
+├── schemas/             # Zod validation schemas
+├── types/               # TypeScript types
+├── store/               # Zustand state management (if needed)
+└── constants.ts         # Module constants
+```
+
+**Principle:** Organize by domain/module, not by file type.
+
 Do not load the entire project into the prompt unless absolutely necessary.
 
 Use the **smallest relevant context** for the task.
