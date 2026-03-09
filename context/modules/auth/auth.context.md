@@ -1,9 +1,11 @@
 # Auth Module Context
 
 ## Purpose
+
 Auth handles authentication and account access for platform users.
 
 ## Core Use Cases
+
 - Login with email and password
 - Logout current session
 - Get current authenticated profile
@@ -15,6 +17,7 @@ Auth handles authentication and account access for platform users.
 - Change password
 
 ## Main Entities
+
 - User
 - CompanyUser
 - EmailVerification
@@ -22,6 +25,7 @@ Auth handles authentication and account access for platform users.
 - PasswordResetToken
 
 ## Key Rules
+
 - Email must be normalized before lookup.
 - Blocked users cannot login.
 - Users without password set cannot login with password flow.
@@ -33,6 +37,7 @@ Auth handles authentication and account access for platform users.
 - Auth does not grant business access by itself; access still depends on company membership and ACL.
 
 ## Main Endpoints
+
 - POST /api/v1/auth/login
 - POST /api/v1/auth/logout
 - GET /api/v1/auth/me
@@ -44,6 +49,7 @@ Auth handles authentication and account access for platform users.
 - POST /api/v1/auth/change-password
 
 ## Dependencies
+
 - users
 - company_users
 - email_verifications
@@ -55,13 +61,9 @@ Auth handles authentication and account access for platform users.
 - mailer
 
 ## Security Notes
+
 - Never store raw passwords.
 - Never store raw reset or verification tokens in DB.
 - Add rate limiting to login and forgot-password.
 - Do not reveal sensitive account existence details in forgot-password flow.
 - Authenticated session is required for /auth/me and /auth/change-password.
-
-## Related Changes
-- Google OAuth
-- MFA
-- Magic links

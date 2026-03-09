@@ -19,16 +19,20 @@ Using the following context:
 Generate the frontend code for the `<module>` module.
 
 Constraints:
+
 - Use Next.js
 - Use TypeScript
 - Use shadcn/ui
 - Use React Hook Form
 - Use Zod
+- Use Zustand for state management if needed
+- Use Server Actions for server mutations if appropriate
 - Organize code by module/domain
 - Do not place module-specific logic in unrelated shared folders
 - Do not invent API contracts that are not present in the spec
 
 Requested output:
+
 - TypeScript types
 - Zod schemas
 - service functions

@@ -1,4 +1,3 @@
-
 # Architecture Overview
 
 This document describes the high‑level architecture of the system and the development workflow used in this project.
@@ -43,22 +42,22 @@ idea
 
 ### Explanation
 
-**Idea**  
+**Idea**
 A new capability or change is proposed.
 
-**Feature Spec (`docs/modules/*.md`)**  
+**Feature Spec (`docs/modules/*.md`)**
 Human readable description of the module or feature.
 
-**Structured Spec (`specs/modules/*.json`)**  
+**Structured Spec (`specs/modules/*.json`)**
 Machine readable definition used for generation.
 
-**Boilerplate Generation**  
+**Boilerplate Generation**
 A CLI (ex: `modulegen`) generates the base code structure.
 
-**Implementation**  
+**Implementation**
 Developers or AI implement business logic.
 
-**Tests**  
+**Tests**
 Tests validate business rules and system behavior.
 
 ---
@@ -70,12 +69,12 @@ The project is designed to work well with a **multi‑repository setup**.
 Typical repositories:
 
 ```
-erp-specs
-erp-backend
-erp-frontend
+specs
+backend
+frontend
 ```
 
-### erp-specs
+### specs
 
 Contains:
 
@@ -97,7 +96,7 @@ This repo acts as the **design source of truth**.
 
 ---
 
-### erp-backend
+### backend
 
 Contains the backend implementation.
 
@@ -114,7 +113,7 @@ Architecture style:
 
 ---
 
-### erp-frontend
+### frontend
 
 Contains the frontend application.
 
@@ -125,6 +124,8 @@ Recommended stack:
 - shadcn/ui
 - React Hook Form
 - Zod
+- Zustand
+- Server components where appropriate
 
 Frontend is organized **by domain module**.
 

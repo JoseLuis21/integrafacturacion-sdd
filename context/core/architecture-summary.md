@@ -90,6 +90,8 @@ Recommended frontend stack:
 - shadcn/ui
 - React Hook Form
 - Zod
+- Zustand for state management
+- Use Server Actions for server mutations if appropriate
 
 ### Frontend organization
 

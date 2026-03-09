@@ -4,60 +4,63 @@ Use this prompt at the beginning of a coding session so the AI understands the p
 
 ---
 
-## Prompt
+## Essential Context Files
 
-You are assisting in the development of a software project using a Specification Driven Development workflow.
+Before starting work, load these core documents:
 
-Project rules:
+1. **[AI Workflow](../core/ai-workflow.md)** — Development flow and source of truth
+2. **[Architecture Summary](../core/architecture-summary.md)** — Project structure and design approach
+3. **[Coding Rules](../core/coding-rules.md)** — Backend and frontend standards
+4. **[Naming Rules](../core/naming-rules.md)** — Stable naming conventions
+5. **Module Context** — Read the relevant module doc under `context/modules/{moduleName}/`
 
-1. Development flow:
-Specification → Structured Spec JSON → Boilerplate → Implementation → Tests
+---
 
-2. Source of truth:
-- feature spec (`docs/modules/...`)
-- structured spec (`specs/modules/.../module.json`)
-- core architecture and coding rules
+## Development Workflow
 
-3. Architecture rules:
-- Backend uses Hexagonal Architecture
-- Domain must not depend on infrastructure
-- Application layer orchestrates use cases and transactions
-- Infrastructure contains HTTP, persistence, and external providers
+Follow the **Specification Driven Development** flow:
 
-4. Backend stack:
-- Go
-- Fiber v2
-- PostgreSQL
-- UUID v7 generated in the application
-- modular structure by domain
+```text
+idea
+→ feature spec (docs/modules/{module}/)
+→ structured spec (specs/modules/{module}/)
+→ boilerplate generation
+→ implementation
+→ tests
+```
 
-5. Frontend stack:
-- Next.js
-- TypeScript
-- shadcn/ui
-- React Hook Form
-- Zod
-- modular structure by domain
+**Key rule:** Do not start with code if the feature is not clearly specified.
 
-6. AI generation rules:
-- follow the existing project structure
-- do not invent a different architecture
-- generate boilerplate first unless asked otherwise
-- do not implement complex business logic unless explicitly requested
-- keep files focused and responsibilities clear
+---
 
-7. Prompt behavior rules:
-- use only the relevant context for the task
-- avoid changing unrelated files
-- respect naming conventions
-- respect architectural boundaries
-- make TODOs explicit when real implementation depends on business decisions
+## Source of Truth (in order)
 
-When implementing a feature:
-- read the module spec
-- read the structured JSON spec
-- use the core context
-- generate or modify only what is needed
+1. Feature spec (`docs/modules/{module}/`)
+2. Structured spec (`specs/modules/{module}/{module}.json`)
+3. Module context (`context/modules/{module}/`)
+4. Core rules from `context/core/`
 
-Never invent architecture.
-Follow the existing project structure.
+Generated code is not the source of truth.
+
+---
+
+## When Implementing a Feature
+
+1. Read the module spec in `docs/modules/{module}/`
+2. Read the structured JSON spec in `specs/modules/{module}/`
+3. Load relevant core context (architecture, coding rules, naming)
+4. Read module-specific context under `context/modules/{module}/`
+5. Generate or modify only what is needed
+6. Respect architectural boundaries and naming conventions
+
+---
+
+## AI Generation Rules
+
+- Follow the existing project structure
+- Do not invent a different architecture
+- Generate boilerplate first unless asked otherwise
+- Do not implement complex business logic unless explicitly requested
+- Keep files focused and responsibilities clear
+- Avoid changing unrelated files
+- Make TODOs explicit when implementation depends on business decisions
