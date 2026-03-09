@@ -13,7 +13,7 @@ Use this file to quickly navigate the system domain and understand which modules
 **Purpose:** authentication and account access
 **Docs:** `docs/modules/auth.md`
 **Spec:** `specs/modules/auth/module.json`
-**Context:** `context/modules/auth.context.md`
+**Context:** `context/modules/auth/auth.context.md`
 
 Typical responsibilities:
 
@@ -22,6 +22,24 @@ Typical responsibilities:
 - current profile
 - verify email
 - reset password
+
+## frontend-foundation
+
+**Purpose:** frontend base infrastructure (routes, layout, api client, stores, shared components)
+**Docs:** `docs/modules/frontend-foundation.md`
+**Context:** `context/core/frontend-structure.md`
+
+Typical responsibilities:
+
+- route groups (landing, auth, dashboard)
+- app shell (sidebar, topbar, user menu, breadcrumbs)
+- API client with typed responses
+- Zustand stores (auth, ui)
+- shared components (DataTable, EmptyState, ConfirmDialog, etc.)
+- route protection middleware
+- module structure convention
+
+---
 
 # Recommended Reading Order
 

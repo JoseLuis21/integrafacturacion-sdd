@@ -14,6 +14,7 @@ These files are useful in most coding sessions:
 - `context/core/coding-rules.md`
 - `context/core/naming-rules.md`
 - `context/core/ai-workflow.md`
+- `context/core/frontend-structure.md`
 
 ---
 
