@@ -23,33 +23,16 @@ Typical responsibilities:
 - verify email
 - reset password
 
-## frontend-foundation
-
-**Purpose:** frontend base infrastructure (routes, layout, api client, stores, shared components)
-**Docs:** `docs/modules/frontend-foundation.md`
-**Context:** `context/core/frontend-structure.md`
-
-Typical responsibilities:
-
-- route groups (landing, auth, dashboard)
-- app shell (sidebar, topbar, user menu, breadcrumbs)
-- API client with typed responses
-- Zustand stores (auth, ui)
-- shared components (DataTable, EmptyState, ConfirmDialog, etc.)
-- route protection middleware
-- module structure convention
-
----
-
 # Recommended Reading Order
 
 For new contributors, a useful reading sequence is:
 
-1. `docs/architecture.md`
+1. `docs/architecture/architecture.md`
 2. `context/core/architecture-summary.md`
-3. `docs/conventions/...`
-4. `indexes/modules-index.md`
-5. the specific module you want to modify
+3. `indexes/architecture-index.md` (foundation & infrastructure)
+4. `docs/conventions/...`
+5. `indexes/modules-index.md`
+6. the specific module you want to modify
 
 ---
 
@@ -58,3 +41,10 @@ For new contributors, a useful reading sequence is:
 - Add new modules here when they become part of the system.
 - If a module is experimental, make that explicit.
 - Keep names consistent with folder names, spec names, and code module names.
+
+---
+
+# Related
+
+- **Architecture & Foundation:** See `indexes/architecture-index.md` for infrastructure components like frontend-foundation that all modules build upon.
+

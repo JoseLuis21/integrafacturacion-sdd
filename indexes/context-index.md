@@ -14,7 +14,14 @@ These files are useful in most coding sessions:
 - `context/core/coding-rules.md`
 - `context/core/naming-rules.md`
 - `context/core/ai-workflow.md`
-- `context/core/frontend-structure.md`
+
+---
+
+# Frontend-Specific Context
+
+When working on frontend features, also load:
+
+- `context/core/frontend-structure.md` (quick frontend architecture reference)
 
 ---
 
