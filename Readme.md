@@ -153,12 +153,14 @@ Reusable AI prompts for different tasks (backend, frontend, feature implementati
 Reusable templates for:
 
 ### Specifications
+
 - `feature-spec-template.md` — Feature specification template
 - `change-spec-template.md` — Change specification template
 - `module-json-template.json` — Module structure template
 - `change-json-template.json` — Change structure template
 
 ### Environment
+
 - `env/backend.env.example` — Backend environment variables template
 
 ## `indexes/`
