@@ -47,4 +47,3 @@ For new contributors, a useful reading sequence is:
 # Related
 
 - **Architecture & Foundation:** See `indexes/architecture-index.md` for infrastructure components like frontend-foundation that all modules build upon.
-

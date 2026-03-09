@@ -19,7 +19,8 @@ Use this file to understand the foundational systems and architectural patterns 
 
 **Purpose:** frontend base infrastructure (routes, layout, api client, stores, shared components)
 
-**Context:** 
+**Context:**
+
 - `context/core/frontend-structure.md` (quick reference)
 - `docs/architecture/frontend-foundation.md` (detailed)
 
