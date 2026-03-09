@@ -8,13 +8,30 @@ Use this prompt to generate or implement backend code for one module.
 
 Using the following context:
 
+**Core Rules:**
+
 - `context/core/architecture-summary.md`
 - `context/core/coding-rules.md`
 - `context/core/naming-rules.md`
+- `context/core/environment-rules.md`
 - `context/core/ai-workflow.md`
+
+**Module-Specific:**
+
 - `context/modules/<module>.context.md`
 - `docs/modules/<module>.md`
 - `specs/modules/<module>/module.json`
+
+**Project Knowledge (as needed):**
+
+- `docs/conventions/` — Coding & naming conventions
+- `docs/glossary/` — Domain terminology
+- `docs/architecture/` — Architecture decisions & patterns
+- `docs/adr/` — Architecture Decision Records
+
+**Additional Discovery:**
+
+- `indexes/` — Use to find relevant documentation, ADRs, and context files
 
 Generate the backend code for the `<module>` module.
 
