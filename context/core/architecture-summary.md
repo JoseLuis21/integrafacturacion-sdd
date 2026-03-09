@@ -99,6 +99,10 @@ Organize by domain/module, not by file type only.
 
 Examples:
 
+---
+
+**For a detailed breakdown of the frontend foundation module and architecture, see [Frontend Foundation](../../docs/architecture/frontend-foundation.md).**
+
 - `modules/auth`
 - `modules/product`
 - `modules/customer`
