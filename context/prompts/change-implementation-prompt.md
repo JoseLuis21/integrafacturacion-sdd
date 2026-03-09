@@ -24,6 +24,7 @@ Task:
 Implement the `<change>` change for the `<module>` module.
 
 Constraints:
+
 - Preserve the current behavior of the existing module unless the change explicitly alters it
 - Do not redesign the module unnecessarily
 - Touch only the files that are relevant to the change
@@ -32,6 +33,7 @@ Constraints:
 - If the change requires new tables, providers, routes, or UI elements, add only the minimum required structure first
 
 Expected output:
+
 - implementation plan
 - affected files
 - code changes or skeletons

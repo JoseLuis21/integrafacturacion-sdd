@@ -19,6 +19,7 @@ Using the following context:
 Generate the backend code for the `<module>` module.
 
 Constraints:
+
 - Use Go
 - Use Fiber v2
 - Use PostgreSQL
@@ -29,6 +30,7 @@ Constraints:
 - Do not invent complex business rules not present in the spec
 
 Requested output:
+
 - domain entity or entities
 - repository interface
 - DTOs
@@ -36,6 +38,12 @@ Requested output:
 - HTTP handler skeletons or implementation
 - routes
 - module registration file if needed
+
+If the target backend repository is empty or missing reusable structure, generate the module using the framework conventions and templates as the source of truth.
+
+Do not treat the absence of code as a blocker.
+Do not try to infer architecture from unrelated repositories.
+Prefer explicit placeholders for undefined infrastructure decisions.
 
 If a rule is ambiguous, do not invent a final answer silently.
 Instead, leave a clear TODO or note the assumption explicitly.
