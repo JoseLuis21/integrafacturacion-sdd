@@ -15,6 +15,7 @@ Using the following context:
 - `context/core/naming-rules.md`
 - `context/core/environment-rules.md`
 - `context/core/ai-workflow.md`
+- `context/core/repository-structure.md`
 
 **Module-Specific:**
 
