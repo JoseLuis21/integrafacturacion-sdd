@@ -194,10 +194,15 @@ Examples:
 
 AI should be used with:
 
-- relevant module spec
-- structured spec JSON
-- core context
-- project conventions
+- `context/core/` — All core rules and guidelines
+  - `architecture-summary.md` — This file
+  - `coding-rules.md` — Code quality standards
+  - `naming-rules.md` — Naming conventions
+  - `environment-rules.md` — Environment & secrets
+  - `repository-structure.md` — Backend structure
+- relevant module spec (`specs/modules/<module>/module.json`)
+- relevant context file (`context/modules/<module>.context.md`)
+- project conventions (`docs/conventions/`, `docs/glossary/`, `docs/adr/`)
 
 ---
 
@@ -214,6 +219,8 @@ See [Readme.md - Framework Structure](../../Readme.md#framework-structure) for t
 - `indexes/` → Navigation and discovery
 
 ### Backend Module Structure
+
+For detailed guidance, see [`repository-structure.md`](repository-structure.md) and [`docs/structure/backend-structure.md`](../../docs/structure/backend-structure.md).
 
 Each backend module follows hexagonal architecture patterns:
 

@@ -62,10 +62,8 @@ framework-sdd/
 │   ├── adr/                         # Architecture Decision Records
 │   ├── conventions/                 # Coding & naming conventions
 │   ├── glossary/                    # Domain terminology
-│   ├── domain/                      # Domain models & bounded contexts
-│   ├── flows/                       # Feature & process flows
 │   ├── modules/                     # Module documentation
-│   ├── changes/                     # Change documentation
+│   ├── structure/                   # Backend & frontend structure suggestions
 │   └── tooling/                     # AI tools & workflows
 ├── specs/                           # Machine-readable specifications
 │   ├── modules/                     # Module definitions
@@ -77,16 +75,25 @@ framework-sdd/
 │   └── shared/                      # Shared types, enums, permissions
 ├── context/                         # AI-optimized context files
 │   ├── core/                        # Core rules & guidelines
+│   │   ├── architecture-summary.md
+│   │   ├── ai-workflow.md
+│   │   ├── coding-rules.md
+│   │   ├── naming-rules.md
+│   │   ├── environment-rules.md
+│   │   └── repository-structure.md
 │   ├── modules/                     # Module-specific context
 │   └── prompts/                     # Reusable AI prompts
 ├── templates/                       # Specification templates
 │   ├── feature-spec-template.md
 │   ├── change-spec-template.md
 │   ├── module-json-template.json
-│   └── change-json-template.json
+│   ├── change-json-template.json
+│   └── env/                         # Environment variable templates
+│       └── backend.env.example
 └── indexes/                         # Navigation & discovery
     ├── modules-index.md
-    └── context-index.md
+    ├── context-index.md
+    └── adr-index.md
 ```
 
 ---
@@ -122,28 +129,52 @@ Includes:
 
 Short context files optimized for AI prompts.
 
-Includes:
+### `context/core/`
 
-- core project rules
-- module-specific summaries
-- reusable prompts
+Core rules and guidelines:
+
+- `architecture-summary.md` — Project architecture, stacks, and folder structure
+- `ai-workflow.md` — AI-assisted development workflow
+- `coding-rules.md` — Code quality & best practices
+- `naming-rules.md` — Naming conventions
+- `environment-rules.md` — Environment variables & secrets configuration
+- `repository-structure.md` — Backend repository structure
+
+### `context/modules/`
+
+Module-specific context files for AI prompts.
+
+### `context/prompts/`
+
+Reusable AI prompts for different tasks (backend, frontend, feature implementation).
 
 ## `templates/`
 
 Reusable templates for:
 
-- feature specs
-- change specs
-- module JSON
-- change JSON
+### Specifications
+- `feature-spec-template.md` — Feature specification template
+- `change-spec-template.md` — Change specification template
+- `module-json-template.json` — Module structure template
+- `change-json-template.json` — Change structure template
+
+### Environment
+- `env/backend.env.example` — Backend environment variables template
 
 ## `indexes/`
 
-Fast navigation files for:
+Fast navigation and discovery files:
 
-- modules
-- context loading
-- ADRs
+- `modules-index.md` — Index of all modules
+- `context-index.md` — Guide to context files
+- `adr-index.md` — Index of Architecture Decision Records
+
+## `docs/structure/`
+
+Backend and frontend code structure suggestions:
+
+- `backend-structure.md` — Recommended backend folder layout (hexagonal architecture)
+- Frontend structure (as needed)
 
 ## `docs/tooling/`
 
