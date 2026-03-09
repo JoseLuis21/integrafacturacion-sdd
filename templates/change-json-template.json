@@ -1,0 +1,55 @@
+{
+  "module": "<module>",
+  "change": "<change-name>",
+  "description": "Describe the change",
+  "newTables": [
+    {
+      "name": "<new_table>",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true,
+          "required": true
+        },
+        {
+          "name": "<fieldName>",
+          "type": "string",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "newFields": [
+    {
+      "table": "<existing_table>",
+      "name": "<newField>",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "newActions": [
+    {
+      "name": "<actionName>",
+      "method": "POST",
+      "path": "/api/v1/<path>",
+      "authRequired": true
+    }
+  ],
+  "rules": [
+    "<rule_1>",
+    "<rule_2>",
+    "<rule_3>"
+  ],
+  "ui": {
+    "changes": [
+      "<ui_change_1>",
+      "<ui_change_2>"
+    ]
+  },
+  "affectedFiles": [
+    "<module> service",
+    "<module> handlers",
+    "<module> routes"
+  ]
+}

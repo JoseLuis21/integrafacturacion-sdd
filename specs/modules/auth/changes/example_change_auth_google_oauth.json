@@ -1,0 +1,92 @@
+{
+  "module": "auth",
+  "change": "google-oauth",
+  "description": "Add Google OAuth authentication support",
+  "newTables": [
+    {
+      "name": "oauth_accounts",
+      "fields": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "primary": true,
+          "required": true
+        },
+        {
+          "name": "userId",
+          "type": "uuid",
+          "required": true,
+          "relation": "users.id"
+        },
+        {
+          "name": "provider",
+          "type": "enum",
+          "required": true,
+          "values": [
+            "google"
+          ]
+        },
+        {
+          "name": "providerUserId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "providerEmail",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "providerEmailVerified",
+          "type": "boolean",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "newActions": [
+    {
+      "name": "startGoogleLogin",
+      "method": "GET",
+      "path": "/api/v1/auth/google/start",
+      "authRequired": false
+    },
+    {
+      "name": "handleGoogleCallback",
+      "method": "GET",
+      "path": "/api/v1/auth/google/callback",
+      "authRequired": false
+    },
+    {
+      "name": "linkGoogleAccount",
+      "method": "POST",
+      "path": "/api/v1/auth/google/link",
+      "authRequired": true
+    },
+    {
+      "name": "unlinkGoogleAccount",
+      "method": "DELETE",
+      "path": "/api/v1/auth/google/unlink",
+      "authRequired": true
+    }
+  ],
+  "rules": [
+    "google email must be verified by provider",
+    "blocked users cannot login through google",
+    "existing user by normalized email should be linked instead of duplicated when policy allows",
+    "callback flow must validate state parameter",
+    "password login flow must continue working"
+  ],
+  "ui": {
+    "addLoginButton": true,
+    "addCallbackPage": true,
+    "allowLinkingInProfile": true
+  },
+  "affectedFiles": [
+    "auth service",
+    "auth handlers",
+    "auth routes",
+    "auth frontend login page",
+    "auth frontend callback page"
+  ]
+}

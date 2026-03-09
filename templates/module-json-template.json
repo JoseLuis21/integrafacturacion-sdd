@@ -1,0 +1,71 @@
+{
+  "module": "<module>",
+  "entity": "<EntityName>",
+  "table": "<table_name>",
+  "description": "Describe the feature or module purpose",
+  "scope": "control_or_tenant",
+  "permissions": [
+    "<module>.read",
+    "<module>.create",
+    "<module>.update"
+  ],
+  "fields": [
+    {
+      "name": "id",
+      "type": "uuid",
+      "primary": true,
+      "required": true
+    },
+    {
+      "name": "<fieldName>",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "<optionalField>",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "actions": [
+    {
+      "name": "create<EntityName>",
+      "method": "POST",
+      "path": "/api/v1/<resources>"
+    },
+    {
+      "name": "list<EntitiesName>",
+      "method": "GET",
+      "path": "/api/v1/<resources>"
+    },
+    {
+      "name": "get<EntityName>ById",
+      "method": "GET",
+      "path": "/api/v1/<resources>/:id"
+    },
+    {
+      "name": "update<EntityName>",
+      "method": "PATCH",
+      "path": "/api/v1/<resources>/:id"
+    }
+  ],
+  "rules": [
+    "<rule_1>",
+    "<rule_2>",
+    "<rule_3>"
+  ],
+  "tables": [
+    "<table_name>"
+  ],
+  "dependencies": [
+    "<dependency_1>",
+    "<dependency_2>"
+  ],
+  "ui": {
+    "pages": [
+      "list",
+      "create",
+      "detail"
+    ]
+  }
+}
