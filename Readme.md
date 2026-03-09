@@ -88,8 +88,15 @@ framework-sdd/
 │   ├── change-spec-template.md
 │   ├── module-json-template.json
 │   ├── change-json-template.json
-│   └── env/                         # Environment variable templates
-│       └── backend.env.example
+│   ├── module/
+│   │   └── module-json-template.json
+│   └── project/                     # Project setup templates
+│       └── backend/
+│           ├── .env.example
+│           ├── Dockerfile
+│           ├── Makefile
+│           ├── docker-compose.yml
+│           └── main.go.template
 └── indexes/                         # Navigation & discovery
     ├── modules-index.md
     ├── context-index.md
@@ -159,9 +166,12 @@ Reusable templates for:
 - `module-json-template.json` — Module structure template
 - `change-json-template.json` — Change structure template
 
-### Environment
+### Project Setup Templates
 
-- `env/backend.env.example` — Backend environment variables template
+- `project/backend/` — Backend project templates
+  - `.env.example` — Environment variables template
+  - `Dockerfile`, `Makefile`, `docker-compose.yml` — Container & build setup
+  - `main.go.template` — Backend entry point template
 
 ## `indexes/`
 

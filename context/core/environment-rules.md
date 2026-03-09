@@ -21,8 +21,12 @@ Secrets include:
 
 ## Environment Templates
 
-Use the templates in [`templates/env/`](../../templates/env) as reference when setting up new environments:
+Use the template in [`templates/project/backend/.env.example`](../../templates/project/backend/.env.example) as reference when setting up new environments.
 
-- `backend.env.example` → Backend environment variables template
+Copy and customize for your environment. Include all required variables from the template:
 
-Each template includes common variables for that stack. Copy and customize for your environment.
+- APP configuration (name, env, port)
+- DATABASE (host, port, credentials, name)
+- JWT settings
+- MAIL provider settings
+- STORAGE provider settings
