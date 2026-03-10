@@ -36,11 +36,11 @@ feature spec (.md + .json)
   ↓
 domain model & rules
   ↓
+boilerplate generation
+  ↓
 AI-assisted implementation
   ↓
 testing & validation
-  ↓
-code generation (optional)
 ```
 
 **Key principle:** The specification is the source of truth, not the generated code.
@@ -95,7 +95,7 @@ framework-sdd/
 │           ├── .env.example
 │           ├── Dockerfile
 │           ├── Makefile
-│           ├── docker-compose.yml
+│           ├── compose.yaml
 │           └── main.go.template
 └── indexes/                         # Navigation & discovery
     ├── modules-index.md
@@ -170,7 +170,7 @@ Reusable templates for:
 
 - `project/backend/` — Backend project templates
   - `.env.example` — Environment variables template
-  - `Dockerfile`, `Makefile`, `docker-compose.yml` — Container & build setup
+  - `Dockerfile`, `Makefile`, `compose.yaml` — Container & build setup
   - `main.go.template` — Backend entry point template
 
 ## `indexes/`
@@ -247,9 +247,11 @@ Includes:
 2. Write docs/modules/<module>.md
 3. Create specs/modules/<module>/module.json
 4. Create context/modules/<module>.context.md
-5. Generate or scaffold code
-6. Implement with spec as reference
-7. Add tests based on specs
+5. Generate or scaffold code, including `Dockerfile` per runnable app or service
+6. Add `compose.yaml` for the minimum local runtime dependencies and use `docker compose` as the standard command
+7. If the deliverable is a library or the spec forbids containerization, document the exception explicitly
+8. Implement with spec as reference
+9. Add tests based on specs
 ```
 
 ## Adding a Feature to a Module
@@ -282,7 +284,10 @@ This framework is designed for **AI-assisted development**. Here's how to use it
 2. **Load context**: Include relevant core & module context files
 3. **Keep it focused**: Only include dependencies you actually need
 4. **Reference rules**: Always include coding and naming rules
-5. **Validate output**: Check generated code against specs and rules
+5. **Expect base containerization**: For runnable scaffolds, include `Dockerfile` and `compose.yaml` unless the spec explicitly justifies an exception
+6. **Use the standard Docker workflow**: Document and invoke local setup with `docker compose`, not legacy `docker-compose.yml`
+7. **Make exceptions explicit**: If Docker artifacts are intentionally omitted, state whether the reason is "non-runnable deliverable" or "spec/prompt forbids it"
+8. **Validate output**: Check generated code against specs and rules
 
 ## When Using AI for Design
 

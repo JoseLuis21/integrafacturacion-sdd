@@ -31,6 +31,8 @@ Constraints:
 - Keep naming and architecture consistent
 - Make compatibility risks explicit
 - If the change requires new tables, providers, routes, or UI elements, add only the minimum required structure first
+- If the change introduces a new runnable service or changes local runtime dependencies, update `Dockerfile` and `compose.yaml`
+- If Docker artifacts are intentionally not updated, state the reason explicitly
 
 Expected output:
 
@@ -38,3 +40,4 @@ Expected output:
 - affected files
 - code changes or skeletons
 - explicit notes about assumptions, risks, or pending decisions
+- explicit note about whether `Dockerfile` and `compose.yaml` must be created or updated

@@ -224,6 +224,18 @@ Examples:
 
 ---
 
+# Local Runtime / Dev Environment (Optional)
+
+Use this section when the module or scaffold is expected to run locally.
+
+- runtime container required: <yes/no>
+- runnable apps or services: <service/app names>
+- local dependencies for `compose.yaml`: <postgres, redis, mailhog, etc.>
+- expected local start command: `docker compose up`
+- justified exception if Docker is intentionally omitted: <reason>
+
+---
+
 # Backend Structure Suggestion
 
 ```text

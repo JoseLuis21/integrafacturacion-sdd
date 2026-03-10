@@ -87,6 +87,10 @@ Create:
 Use a CLI or generation flow to create:
 - backend skeleton
 - frontend skeleton
+- `Dockerfile` for each runnable service or application
+- `compose.yaml` for the minimum local runtime dependencies needed by the scaffold
+
+If the deliverable is a library, a non-runnable package, or the spec explicitly forbids containerization, make that exception explicit instead of omitting Docker silently.
 
 ### Step 4 — Review generated structure
 Check:
@@ -129,6 +133,7 @@ When asking AI to write code:
 - define what must not be changed
 - define the business rules explicitly
 - define the expected output
+- if the task generates a runnable scaffold and no exception was requested, include base containerization with `Dockerfile` and `compose.yaml`
 
 Bad:
 - “implement auth”

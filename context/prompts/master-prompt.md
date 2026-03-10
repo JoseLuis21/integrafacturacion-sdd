@@ -60,6 +60,8 @@ Generated code is not the source of truth.
 - Follow the existing project structure
 - Do not invent a different architecture
 - Generate boilerplate first unless asked otherwise
+- Include `Dockerfile` and `compose.yaml` by default for runnable services or applications
+- If Docker artifacts are omitted, state the reason explicitly
 - Do not implement complex business logic unless explicitly requested
 - Keep files focused and responsibilities clear
 - Avoid changing unrelated files

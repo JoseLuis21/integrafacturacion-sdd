@@ -30,6 +30,9 @@ Constraints:
 - Organize code by module/domain
 - Do not place module-specific logic in unrelated shared folders
 - Do not invent API contracts that are not present in the spec
+- Include a `Dockerfile` when the output is a runnable frontend application
+- Prefer adding `compose.yaml` when the frontend depends on a local backend or other local services
+- If Docker artifacts are intentionally omitted, state the reason explicitly
 
 Requested output:
 
@@ -40,5 +43,7 @@ Requested output:
 - form component
 - table/list component
 - page skeletons if needed
+- `Dockerfile` for runnable frontend apps
+- `compose.yaml` when local service orchestration is needed
 
 If something is not defined clearly in the spec, make the uncertainty explicit instead of inventing it silently.

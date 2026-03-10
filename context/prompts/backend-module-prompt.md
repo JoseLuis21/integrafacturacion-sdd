@@ -46,6 +46,9 @@ Constraints:
 - Use the existing module structure
 - Do not modify unrelated modules
 - Do not invent complex business rules not present in the spec
+- Include a `Dockerfile` for the runnable backend service by default
+- Include a `compose.yaml` when the module needs PostgreSQL, cache, or other local support services
+- If containerization is intentionally omitted, state the reason explicitly
 
 Requested output:
 
@@ -56,6 +59,8 @@ Requested output:
 - HTTP handler skeletons or implementation
 - routes
 - module registration file if needed
+- `Dockerfile`
+- `compose.yaml` when local dependencies are required
 
 If the target backend repository is empty or missing reusable structure, generate the module using the framework conventions and templates as the source of truth.
 
