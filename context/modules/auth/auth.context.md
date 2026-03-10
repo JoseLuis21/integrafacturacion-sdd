@@ -111,7 +111,8 @@ src/modules/auth/
     ├── forgot-password-form.tsx
     ├── reset-password-form.tsx
     ├── set-password-form.tsx
-    └── change-password-form.tsx
+    ├── change-password-form.tsx
+    └── profile-card.tsx
 ```
 
 ### Pages
@@ -122,6 +123,7 @@ src/modules/auth/
 - `src/app/(auth)/set-password/?token=X` → SetPasswordForm (server component extracts token)
 - `src/app/(auth)/verify-email/?token=X` → useVerifyEmail auto-trigger (client component)
 - `src/app/(dashboard)/settings/change-password/` → ChangePasswordForm (authenticated)
+- `src/app/(dashboard)/settings/profile/` → ProfileCard (authenticated, read-only)
 
 ### Key Patterns
 
