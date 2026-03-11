@@ -19,6 +19,10 @@ idea
 → feature spec (.md)
 → structured spec (.json)
 → boilerplate generation
+→ migrations
+→ docker
+→ postman
+→ makefile
 → implementation
 → tests
 ```
@@ -57,6 +61,11 @@ Structured machine-readable definitions used for generation.
 
 Short context files optimized for AI prompts.
 
+Operational artifacts are part of the design contract, not an afterthought.
+If a backend module introduces tables or endpoints, the spec should also describe its migrations, container/runtime assumptions, and API testing artifacts.
+Protected endpoints should also declare their auth transport, JWT claims contract, and request context keys explicitly.
+Operational commands and onboarding artifacts should be standardized through project-level templates.
+
 ---
 
 ## Backend Architecture
@@ -78,6 +87,7 @@ Recommended backend stack:
 ### Rule
 
 The domain layer must not depend on infrastructure.
+JWT parsing belongs in HTTP middleware, not in handlers or use cases.
 
 ---
 
@@ -201,6 +211,10 @@ AI should be used with:
 - `context/core/` — All core rules and guidelines
   - `architecture-summary.md` — This file
   - `coding-rules.md` — Code quality standards
+  - `infrastructure-rules.md` — Migrations, Docker, and ownership rules
+  - `operational-artifacts-rules.md` — Makefile, env template, and project-level workflow contract
+  - `api-artifacts-rules.md` — Postman and API example rules
+  - `auth-middleware-rules.md` — Bearer token and protected endpoint contract
   - `naming-rules.md` — Naming conventions
   - `environment-rules.md` — Environment & secrets
   - `repository-structure.md` — Backend structure

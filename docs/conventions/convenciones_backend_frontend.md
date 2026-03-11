@@ -948,3 +948,73 @@ Con estas convenciones el proyecto puede crecer con orden cuando metas:
 - auditoría
 - más tenants
 - más desarrolladores
+
+---
+
+# 23. Convenciones de artefactos operacionales
+
+## 23.1 Artefactos project-level
+
+Se generan una vez por backend runnable:
+
+- `Makefile`
+- `Dockerfile`
+- `docker-compose.yml`
+- `.dockerignore`
+- `.env.example`
+- `internal/platform/database/migrations.go`
+- `postman/base.postman_collection.json`
+- `postman/local.postman_environment.json`
+
+## 23.2 Artefactos module-level
+
+Cada módulo genera o mantiene:
+
+- migraciones SQL de sus tablas
+- folder/items Postman de sus endpoints
+- ejemplos request/response en `specs/modules/<module>/module.json`
+
+## 23.3 Convención de migraciones SQL
+
+- el módulo dueño de la tabla genera la migración
+- runner base: SQL embebido en el binario
+- usar archivos SQL versionados
+- tabla de control: `schema_migrations`
+- seeds separados de migraciones estructurales
+- nombre sugerido: `000001_init_<module>_schema.sql`
+- para cambios incrementales: `00000N_<verb>_<resource>_<module>.sql`
+- una migración debe ser idempotente cuando sea razonable
+
+## 23.4 Convención Docker
+
+- archivo canónico: `docker-compose.yml`
+- `Dockerfile` en raíz del backend
+- `docker-compose.yml` en raíz del backend
+- servicios base por defecto: `api` y `postgres`
+- healthcheck HTTP estándar en `GET /health`
+- variables mínimas: `APP_ENV`, `APP_PORT`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSLMODE`, `DB_AUTO_MIGRATE`
+- usar variables de entorno, no secretos hardcodeados
+- por defecto las migraciones corren en el mismo binario de la API, no en un job aparte
+
+## 23.5 Convención Postman
+
+- estrategia base: una colección por proyecto con folders por módulo
+- usar carpeta `postman/` en raíz del backend
+- incluir una colección importable
+- environment local estándar: `postman/local.postman_environment.json`
+- variables mínimas: `baseUrl`, `accessToken`, `refreshToken`, `userId`, `companyId`, `resourceId`
+- nombre sugerido de request: `<Module> / <Action>`
+- login o refresh debe incluir script para capturar `accessToken`
+
+## 23.6 Convención Makefile
+
+- `Makefile` en raíz del backend
+- targets mínimos: `fmt`, `tidy`, `build`, `test`, `run`, `verify`, `docker-up`, `docker-down`
+- targets recomendados adicionales: `postman-validate`, `docker-config`, `docker-logs`, `docker-ps`, `docker-rebuild`, `db-up`, `db-down`
+- no inventar comandos distintos para el mismo workflow base sin ADR
+
+## 23.7 Regla de ownership
+
+- un módulo no debe escribir migraciones para tablas que no posee
+- artefactos project-level se actualizan cuando cambia el contrato compartido
+- artefactos module-level se actualizan cuando cambia el contrato del módulo

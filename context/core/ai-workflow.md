@@ -14,6 +14,10 @@ idea
 → feature spec (.md)
 → structured spec (.json)
 → boilerplate generation
+→ migrations
+→ docker
+→ postman
+→ makefile
 → implementation
 → tests
 ```
@@ -87,16 +91,35 @@ Create:
 Use a CLI or generation flow to create:
 - backend skeleton
 - frontend skeleton
+- SQL migration files for module-owned tables
+- `.env.example`
+- `Makefile`
 - `Dockerfile` for each runnable service or application
-- `compose.yaml` for the minimum local runtime dependencies needed by the scaffold
+- `docker-compose.yml` for the minimum local runtime dependencies needed by the scaffold
+- base Postman collection and local environment for backend APIs
 
 If the deliverable is a library, a non-runnable package, or the spec explicitly forbids containerization, make that exception explicit instead of omitting Docker silently.
+
+### Extended generation sequence
+
+Boilerplate generation should include, when applicable:
+
+- backend skeleton
+- migrations
+- docker artifacts
+- postman artifacts
+- makefile
+- environment templates
 
 ### Step 4 — Review generated structure
 Check:
 - naming
 - architecture
 - files created
+- migration ownership
+- Docker service names and env vars
+- Postman coverage for exposed endpoints
+- Makefile targets and local developer workflow
 - missing pieces
 - unnecessary files
 
@@ -133,7 +156,16 @@ When asking AI to write code:
 - define what must not be changed
 - define the business rules explicitly
 - define the expected output
-- if the task generates a runnable scaffold and no exception was requested, include base containerization with `Dockerfile` and `compose.yaml`
+- if the task generates a runnable backend scaffold and no exception was requested, include base migrations, `Makefile`, `.env.example`, `Dockerfile`, `docker-compose.yml`, and Postman artifacts
+- if the task changes API contracts, update request/response examples and Postman items together
+
+When generating backend foundations, do not stop at application code if the project still lacks:
+
+- migrations
+- docker
+- environment templates
+- operational commands
+- API testing artifacts
 
 Bad:
 - “implement auth”

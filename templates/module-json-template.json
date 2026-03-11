@@ -4,6 +4,142 @@
   "table": "<table_name>",
   "description": "Describe the feature or module purpose",
   "scope": "control_or_tenant",
+  "database": {
+    "owner": "<module>",
+    "tables": [
+      {
+        "name": "<table_name>",
+        "owner": "<module>",
+        "scope": "control_or_tenant",
+        "columns": [
+          {
+            "name": "id",
+            "type": "uuid",
+            "nullable": false,
+            "primary": true
+          }
+        ],
+        "indexes": [
+          {
+            "name": "idx_<table_name>_<field_name>",
+            "columns": ["<field_name>"],
+            "unique": false
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "migrations": {
+      "enabled": true,
+      "runner": "embedded_sql",
+      "autoRunOnStartup": true,
+      "controlTable": "schema_migrations",
+      "namingPattern": "000001_init_<module>_schema.sql",
+      "seedsSeparated": true
+    }
+  },
+  "migrations": {
+    "enabled": true,
+    "strategy": "embedded_sql",
+    "autoRunOnStartup": true
+  },
+  "docker": {
+    "enabled": true,
+    "files": ["Dockerfile", "docker-compose.yml", ".dockerignore"],
+    "services": ["api", "postgres"],
+    "appPort": 8080,
+    "requiredEnv": [
+      "APP_ENV",
+      "APP_PORT",
+      "DB_HOST",
+      "DB_PORT",
+      "DB_USER",
+      "DB_PASSWORD",
+      "DB_NAME",
+      "DB_SSLMODE",
+      "DB_AUTO_MIGRATE"
+    ],
+    "healthcheck": {
+      "type": "http",
+      "path": "/health"
+    }
+  },
+  "postman": {
+    "enabled": true,
+    "collectionStrategy": "single_project_collection",
+    "collectionGroup": "<module>",
+    "environment": "local",
+    "files": [
+      "postman/base.postman_collection.json",
+      "postman/local.postman_environment.json"
+    ],
+    "variables": [
+      "baseUrl",
+      "accessToken",
+      "refreshToken",
+      "userId",
+      "companyId",
+      "resourceId"
+    ],
+    "captureAccessTokenFrom": "<action_name>",
+    "examplesPerAction": true
+  },
+  "makeTargets": [
+    "fmt",
+    "tidy",
+    "build",
+    "test",
+    "run",
+    "verify",
+    "docker-up",
+    "docker-down"
+  ],
+  "authTransport": {
+    "scheme": "Bearer",
+    "header": "Authorization"
+  },
+  "middlewareContract": {
+    "requiredForActions": [],
+    "contextValues": ["userID"],
+    "tokenValidatedIn": "http_middleware",
+    "handlersReadFrom": "request_context",
+    "unauthorizedErrorCode": "UNAUTHORIZED",
+    "unauthorizedResponse": {
+      "httpStatus": 401,
+      "body": {
+        "success": false,
+        "message": "Unauthorized",
+        "error": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    }
+  },
+  "jwtClaims": {
+    "subject": "sub",
+    "issuer": "iss",
+    "email": "eml",
+    "sessionId": "sid",
+    "issuedAt": "iat",
+    "expiresAt": "exp"
+  },
+  "examples": {
+    "requests": [
+      {
+        "action": "create<EntityName>",
+        "name": "default",
+        "body": {}
+      }
+    ],
+    "responses": [
+      {
+        "action": "create<EntityName>",
+        "name": "success",
+        "status": 200,
+        "body": {}
+      }
+    ]
+  },
   "permissions": [
     "<module>.read",
     "<module>.create",

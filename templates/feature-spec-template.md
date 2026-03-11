@@ -230,7 +230,9 @@ Use this section when the module or scaffold is expected to run locally.
 
 - runtime container required: <yes/no>
 - runnable apps or services: <service/app names>
-- local dependencies for `compose.yaml`: <postgres, redis, mailhog, etc.>
+- local dependencies for `docker-compose.yml`: <postgres, redis, mailhog, etc.>
+- migrations required: <yes/no>
+- postman artifacts required: <yes/no>
 - expected local start command: `docker compose up`
 - justified exception if Docker is intentionally omitted: <reason>
 

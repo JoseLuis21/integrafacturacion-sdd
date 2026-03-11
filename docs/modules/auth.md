@@ -236,27 +236,60 @@ Authentication uses:
 
 # Auth Middleware Contract
 
-Authenticated endpoints depend on middleware that validates the access token and injects request-scoped auth data.
+Protected endpoints require `Authorization: Bearer <access-token>`.
 
-## Middleware output
+Authenticated endpoints depend on HTTP middleware that validates the access token and injects request-scoped auth data.
 
-The middleware must make available:
+The auth middleware must:
+
+- read the bearer token from the `Authorization` header
+- validate the JWT signature
+- validate the token issuer
+- validate expiration
+- extract `sub` as the authenticated user id
+- inject request-scoped auth values into the HTTP context
+- return the standard unauthorized response when the bearer token is missing or invalid
+
+## Context values injected by middleware
 
 - `userID`
-- `sessionID` if refresh/session persistence is used
 - `email`
-- optional `companyID` if tenant context was already selected
+- `sessionID` if refresh/session persistence is used
 
-## JWT claims
+## JWT claims contract
 
-Suggested claims:
+The middleware reads these claims from the access token:
 
-- `sub` → user id
+- `sub` → authenticated user id
 - `sid` → session id
 - `eml` → email
 - `iss` → issuer
 - `iat` → issued at
 - `exp` → expiration
+
+## Protected endpoints
+
+- `GET /api/v1/auth/me`
+- `POST /api/v1/auth/logout`
+- `POST /api/v1/auth/change-password`
+
+## Handler boundary
+
+- Protected handlers must not parse JWT directly.
+- JWT parsing belongs in HTTP middleware.
+- Handlers and use cases must rely on `userID`, `email`, and `sessionID` from request context/locals.
+
+## Unauthorized response
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized",
+  "error": {
+    "code": "UNAUTHORIZED"
+  }
+}
+```
 
 ---
 
@@ -458,7 +491,11 @@ Invalidate the current authenticated session.
 
 ### Auth required
 
-Yes
+Yes. Use `Authorization: Bearer <access-token>`.
+
+### Unauthorized response
+
+Returns the standard `UNAUTHORIZED` response when the bearer token is missing or invalid.
 
 ---
 
@@ -468,7 +505,7 @@ Return the current authenticated user profile.
 
 ### Auth required
 
-Yes
+Yes. Use `Authorization: Bearer <access-token>`.
 
 ### Response
 
@@ -574,7 +611,11 @@ Change password for the current authenticated user.
 
 ### Auth required
 
-Yes
+Yes. Use `Authorization: Bearer <access-token>`.
+
+### Unauthorized response
+
+Returns the standard `UNAUTHORIZED` response when the bearer token is missing or invalid.
 
 ### Request
 

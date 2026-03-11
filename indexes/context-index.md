@@ -12,6 +12,10 @@ These files are useful in most coding sessions:
 
 - `context/core/architecture-summary.md`
 - `context/core/coding-rules.md`
+- `context/core/infrastructure-rules.md`
+- `context/core/operational-artifacts-rules.md`
+- `context/core/api-artifacts-rules.md`
+- `context/core/auth-middleware-rules.md`
 - `context/core/naming-rules.md`
 - `context/core/ai-workflow.md`
 
@@ -34,10 +38,25 @@ Load:
 - core context files
 - `docs/modules/<module>.md`
 - `specs/modules/<module>/module.json`
+- `context/prompts/backend-module-prompt.md`
 
 Optional:
 
 - one or two nearby dependency modules if needed
+
+---
+
+## Bootstrap backend foundation
+
+Load:
+
+- core context files
+- `context/core/infrastructure-rules.md`
+- `context/core/operational-artifacts-rules.md`
+- `context/core/api-artifacts-rules.md`
+- `context/core/auth-middleware-rules.md`
+- `templates/project/backend/`
+- `context/prompts/backend-foundation-prompt.md`
 
 ---
 
@@ -49,6 +68,10 @@ Load:
 - `context/modules/<module>.context.md`
 - `docs/modules/<module>.md`
 - `specs/modules/<module>/module.json`
+- `context/core/infrastructure-rules.md`
+- `context/core/operational-artifacts-rules.md`
+- `context/core/api-artifacts-rules.md`
+- `context/core/auth-middleware-rules.md` when endpoints are protected
 
 ---
 
@@ -99,6 +122,7 @@ Load:
 - `docs/modules/<module>.md`
 - relevant template if needed
 - optionally `context/core/naming-rules.md`
+- `context/core/auth-middleware-rules.md` when the module exposes protected endpoints
 
 ---
 
@@ -108,7 +132,23 @@ Load:
 
 - `docs/modules/<module>.md`
 - `templates/module-json-template.json`
+- `context/core/infrastructure-rules.md`
+- `context/core/operational-artifacts-rules.md`
+- `context/core/api-artifacts-rules.md`
 - core naming rules if useful
+
+---
+
+## Generate migrations, Docker, Postman, or Make artifacts
+
+Load:
+
+- core context files
+- `context/core/infrastructure-rules.md`
+- `context/core/operational-artifacts-rules.md`
+- `context/core/api-artifacts-rules.md`
+- `specs/modules/<module>/module.json`
+- `indexes/devops-index.md`
 
 ---
 
@@ -146,6 +186,7 @@ Avoid loading:
 Useful reusable prompt files:
 
 - `context/prompts/master-prompt.md`
+- `context/prompts/backend-foundation-prompt.md`
 - `context/prompts/backend-module-prompt.md`
 - `context/prompts/frontend-module-prompt.md`
 - `context/prompts/change-implementation-prompt.md`

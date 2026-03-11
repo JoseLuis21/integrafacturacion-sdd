@@ -27,6 +27,7 @@ Copy and customize for your environment. Include all required variables from the
 
 - APP configuration (name, env, port)
 - DATABASE (host, port, credentials, name)
+- DATABASE runtime flags (`DB_SSLMODE`, `DB_AUTO_MIGRATE`)
 - JWT settings
 - MAIL provider settings
 - STORAGE provider settings

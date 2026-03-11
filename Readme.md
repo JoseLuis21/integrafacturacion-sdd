@@ -38,6 +38,10 @@ domain model & rules
   ↓
 boilerplate generation
   ↓
+migrations
+  ↓
+docker + makefile + postman
+  ↓
 AI-assisted implementation
   ↓
 testing & validation
@@ -77,6 +81,10 @@ framework-sdd/
 │   ├── core/                        # Core rules & guidelines
 │   │   ├── architecture-summary.md
 │   │   ├── ai-workflow.md
+│   │   ├── infrastructure-rules.md
+│   │   ├── operational-artifacts-rules.md
+│   │   ├── api-artifacts-rules.md
+│   │   ├── auth-middleware-rules.md
 │   │   ├── coding-rules.md
 │   │   ├── naming-rules.md
 │   │   ├── environment-rules.md
@@ -93,14 +101,20 @@ framework-sdd/
 │   └── project/                     # Project setup templates
 │       └── backend/
 │           ├── .env.example
+│           ├── .dockerignore
 │           ├── Dockerfile
 │           ├── Makefile
-│           ├── compose.yaml
+│           ├── docker-compose.yml
+│           ├── internal/platform/database/migrations.go
+│           ├── internal/shared/http/auth_middleware.go
+│           ├── postman/
 │           └── main.go.template
 └── indexes/                         # Navigation & discovery
     ├── modules-index.md
     ├── context-index.md
-    └── adr-index.md
+    ├── adr-index.md
+    ├── templates-index.md
+    └── devops-index.md
 ```
 
 ---
@@ -142,6 +156,10 @@ Core rules and guidelines:
 
 - `architecture-summary.md` — Project architecture, stacks, and folder structure
 - `ai-workflow.md` — AI-assisted development workflow
+- `infrastructure-rules.md` — Operational artifact and ownership rules
+- `operational-artifacts-rules.md` — Makefile, env template, and onboarding rules
+- `api-artifacts-rules.md` — Postman and API example rules
+- `auth-middleware-rules.md` — Protected endpoint and bearer token rules
 - `coding-rules.md` — Code quality & best practices
 - `naming-rules.md` — Naming conventions
 - `environment-rules.md` — Environment variables & secrets configuration
@@ -170,7 +188,10 @@ Reusable templates for:
 
 - `project/backend/` — Backend project templates
   - `.env.example` — Environment variables template
-  - `Dockerfile`, `Makefile`, `compose.yaml` — Container & build setup
+  - `.dockerignore`, `Dockerfile`, `docker-compose.yml`, `Makefile` — Container & build setup
+  - `internal/platform/database/migrations.go` — Embedded migration runner
+  - `internal/shared/http/auth_middleware.go` — Shared bearer token middleware template
+  - `postman/` — Base API collection and local environment
   - `main.go.template` — Backend entry point template
 
 ## `indexes/`
@@ -180,6 +201,8 @@ Fast navigation and discovery files:
 - `modules-index.md` — Index of all modules
 - `context-index.md` — Guide to context files
 - `adr-index.md` — Index of Architecture Decision Records
+- `templates-index.md` — Index of reusable templates
+- `devops-index.md` — Index of migrations, Docker, and Postman rules
 
 ## `docs/structure/`
 
@@ -247,8 +270,8 @@ Includes:
 2. Write docs/modules/<module>.md
 3. Create specs/modules/<module>/module.json
 4. Create context/modules/<module>.context.md
-5. Generate or scaffold code, including `Dockerfile` per runnable app or service
-6. Add `compose.yaml` for the minimum local runtime dependencies and use `docker compose` as the standard command
+5. Generate or scaffold code, including module-owned migrations
+6. Add `Makefile`, `.env.example`, `Dockerfile`, `docker-compose.yml`, and Postman artifacts for runnable backends
 7. If the deliverable is a library or the spec forbids containerization, document the exception explicitly
 8. Implement with spec as reference
 9. Add tests based on specs
@@ -284,10 +307,10 @@ This framework is designed for **AI-assisted development**. Here's how to use it
 2. **Load context**: Include relevant core & module context files
 3. **Keep it focused**: Only include dependencies you actually need
 4. **Reference rules**: Always include coding and naming rules
-5. **Expect base containerization**: For runnable scaffolds, include `Dockerfile` and `compose.yaml` unless the spec explicitly justifies an exception
-6. **Use the standard Docker workflow**: Document and invoke local setup with `docker compose`, not legacy `docker-compose.yml`
-7. **Make exceptions explicit**: If Docker artifacts are intentionally omitted, state whether the reason is "non-runnable deliverable" or "spec/prompt forbids it"
-8. **Validate output**: Check generated code against specs and rules
+5. **Expect operational artifacts**: For runnable backend scaffolds, include migrations, `Makefile`, `.env.example`, `Dockerfile`, `docker-compose.yml`, and Postman assets unless the spec explicitly justifies an exception
+6. **Use the standard Docker workflow**: Document and invoke local setup with `docker compose`
+7. **Make exceptions explicit**: If Docker or API artifacts are intentionally omitted, state whether the reason is "non-runnable deliverable" or "spec/prompt forbids it"
+8. **Validate output**: Check generated code, migrations, Make targets, Docker, and examples against specs and rules
 
 ## When Using AI for Design
 

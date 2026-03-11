@@ -11,8 +11,12 @@ Before starting work, load these core documents:
 1. **[AI Workflow](../core/ai-workflow.md)** — Development flow and source of truth
 2. **[Architecture Summary](../core/architecture-summary.md)** — Project structure and design approach
 3. **[Coding Rules](../core/coding-rules.md)** — Backend and frontend standards
-4. **[Naming Rules](../core/naming-rules.md)** — Stable naming conventions
-5. **Module Context** — Read the relevant module doc under `context/modules/{moduleName}/`
+4. **[Infrastructure Rules](../core/infrastructure-rules.md)** — Migration, Docker, and ownership contract
+5. **[Operational Artifacts Rules](../core/operational-artifacts-rules.md)** — Makefile, env template, and onboarding contract
+6. **[API Artifacts Rules](../core/api-artifacts-rules.md)** — Postman and example contract
+7. **[Auth Middleware Rules](../core/auth-middleware-rules.md)** — Bearer token and protected endpoint contract
+8. **[Naming Rules](../core/naming-rules.md)** — Stable naming conventions
+9. **Module Context** — Read the relevant module doc under `context/modules/{moduleName}/`
 
 ---
 
@@ -50,8 +54,10 @@ Generated code is not the source of truth.
 2. Read the structured JSON spec in `specs/modules/{module}/`
 3. Load relevant core context (architecture, coding rules, naming)
 4. Read module-specific context under `context/modules/{module}/`
-5. Generate or modify only what is needed
-6. Respect architectural boundaries and naming conventions
+5. If the backend foundation is missing, start with `context/prompts/backend-foundation-prompt.md`
+6. If the backend foundation already exists, use `context/prompts/backend-module-prompt.md`
+7. Generate or modify only what is needed
+8. Respect architectural boundaries and naming conventions
 
 ---
 
@@ -60,7 +66,9 @@ Generated code is not the source of truth.
 - Follow the existing project structure
 - Do not invent a different architecture
 - Generate boilerplate first unless asked otherwise
-- Include `Dockerfile` and `compose.yaml` by default for runnable services or applications
+- Include migrations, `Makefile`, `.env.example`, `Dockerfile`, `docker-compose.yml`, and Postman artifacts by default for runnable backend services
+- Define auth middleware contract explicitly when the module exposes protected endpoints
+- Separate `Project-level changes` from `Module-level changes` in the output when working on backend generation
 - If Docker artifacts are omitted, state the reason explicitly
 - Do not implement complex business logic unless explicitly requested
 - Keep files focused and responsibilities clear

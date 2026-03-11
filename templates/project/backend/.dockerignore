@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+bin
+coverage
+dist
+node_modules
+tmp
+.env
+.env.*
+postman

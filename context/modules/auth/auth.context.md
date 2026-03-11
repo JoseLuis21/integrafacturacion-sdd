@@ -36,9 +36,17 @@ Auth handles authentication and account access for platform users.
 - Password reset tokens expire in 1 hour and are one-time use.
 - Login updates `last_login_at`.
 - Login may succeed without company membership, but tenant access requires at least one active company membership.
-- Authenticated endpoints require middleware to inject `userID` and `sessionID` into request context.
+- Protected auth endpoints require `Authorization: Bearer <token>`.
 - Logout revokes the current refresh token/session.
 - Forgot-password must not reveal whether the account exists.
+
+## Auth Middleware Rules
+
+- Protected auth endpoints require `Authorization: Bearer <token>`.
+- Middleware must validate JWT signature, issuer, and expiration.
+- Middleware must inject `userID` from `sub` into request context.
+- Middleware may inject `email` from `eml` and `sessionID` from `sid`.
+- Missing or invalid bearer token returns `UNAUTHORIZED`.
 
 ## Main Endpoints
 

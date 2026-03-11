@@ -59,6 +59,41 @@ Use this file to quickly understand why major technical decisions were made.
 
 ---
 
+## ADR-007 — Embedded SQL migrations as the default migration strategy
+
+**File:** `docs/adr/007-database-migrations.md`
+**Summary:** Backend projects use embedded SQL migrations with module ownership rules and a shared `schema_migrations` control table.
+
+---
+
+## ADR-008 — Standard containerization for runnable backends
+
+**File:** `docs/adr/008-containerization.md`
+**Summary:** Runnable backend scaffolds ship with `Dockerfile`, `docker-compose.yml`, standard healthchecks, and minimum environment variables.
+
+---
+
+## ADR-009 — Shared Postman collection and local API testing artifacts
+
+**File:** `docs/adr/009-api-testing-artifacts.md`
+**Summary:** API testing uses a single project collection with module folders, a standard local environment, and reusable auth capture scripts.
+
+---
+
+## ADR-010 — Auth middleware validates JWT and injects request auth context
+
+**File:** `docs/adr/010-auth-middleware-contract.md`
+**Summary:** Protected HTTP endpoints rely on middleware to validate bearer JWTs, map claims, and inject request-scoped auth values instead of parsing tokens in handlers.
+
+---
+
+## ADR-011 — Runnable backend projects include standard operational artifacts
+
+**File:** `docs/adr/011-backend-operational-artifacts.md`
+**Summary:** Runnable backend projects standardize `Makefile`, env template, Docker, and Postman artifacts so generated backends share the same developer workflow.
+
+---
+
 # How to Use ADRs
 
 Read ADRs when:

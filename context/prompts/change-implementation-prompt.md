@@ -12,6 +12,8 @@ Use the following context:
 
 - `context/core/architecture-summary.md`
 - `context/core/coding-rules.md`
+- `context/core/operational-artifacts-rules.md`
+- `context/core/auth-middleware-rules.md`
 - `context/core/naming-rules.md`
 - `context/core/ai-workflow.md`
 - `context/modules/<module>.context.md`
@@ -31,7 +33,9 @@ Constraints:
 - Keep naming and architecture consistent
 - Make compatibility risks explicit
 - If the change requires new tables, providers, routes, or UI elements, add only the minimum required structure first
-- If the change introduces a new runnable service or changes local runtime dependencies, update `Dockerfile` and `compose.yaml`
+- If the change introduces new tables, update module-owned migrations and request/response examples
+- If the change touches protected endpoints, update auth transport, middleware contract, and JWT claims mapping
+- If the change introduces a new runnable service or changes local runtime dependencies, update `Makefile`, `.env.example`, `Dockerfile`, and `docker-compose.yml`
 - If Docker artifacts are intentionally not updated, state the reason explicitly
 
 Expected output:
@@ -40,4 +44,5 @@ Expected output:
 - affected files
 - code changes or skeletons
 - explicit notes about assumptions, risks, or pending decisions
-- explicit note about whether `Dockerfile` and `compose.yaml` must be created or updated
+- explicit note about whether migrations, `Makefile`, `.env.example`, `Dockerfile`, `docker-compose.yml`, and Postman artifacts must be created or updated
+- explicit note about whether auth middleware contract changed
