@@ -8,55 +8,6 @@
     "owner": "auth",
     "tables": [
       {
-        "name": "users",
-        "owner": "auth",
-        "scope": "control",
-        "columns": [
-          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
-          { "name": "email", "type": "varchar(255)", "nullable": false },
-          { "name": "email_normalized", "type": "varchar(255)", "nullable": false },
-          { "name": "password_hash", "type": "varchar(255)", "nullable": true },
-          { "name": "password_set_at", "type": "timestamptz", "nullable": true },
-          { "name": "status", "type": "varchar(50)", "nullable": false },
-          { "name": "first_name", "type": "varchar(120)", "nullable": true },
-          { "name": "last_name", "type": "varchar(120)", "nullable": true },
-          { "name": "full_name", "type": "varchar(240)", "nullable": true },
-          { "name": "phone", "type": "varchar(40)", "nullable": true },
-          { "name": "locale", "type": "varchar(20)", "nullable": false, "default": "es-CL" },
-          { "name": "last_login_at", "type": "timestamptz", "nullable": true },
-          { "name": "created_at", "type": "timestamptz", "nullable": false },
-          { "name": "updated_at", "type": "timestamptz", "nullable": false }
-        ],
-        "indexes": [
-          { "name": "ux_users_email", "columns": ["email"], "unique": true },
-          { "name": "ux_users_email_normalized", "columns": ["email_normalized"], "unique": true }
-        ],
-        "foreignKeys": []
-      },
-      {
-        "name": "company_users",
-        "owner": "auth",
-        "scope": "control",
-        "columns": [
-          { "name": "company_id", "type": "uuid", "nullable": false },
-          { "name": "user_id", "type": "uuid", "nullable": false },
-          { "name": "status", "type": "varchar(50)", "nullable": false },
-          { "name": "created_at", "type": "timestamptz", "nullable": false }
-        ],
-        "indexes": [
-          { "name": "ux_company_users_company_user", "columns": ["company_id", "user_id"], "unique": true },
-          { "name": "idx_company_users_user_id", "columns": ["user_id"], "unique": false }
-        ],
-        "foreignKeys": [
-          {
-            "name": "fk_company_users_user_id",
-            "column": "user_id",
-            "references": { "table": "users", "column": "id" },
-            "onDelete": "cascade"
-          }
-        ]
-      },
-      {
         "name": "email_verifications",
         "owner": "auth",
         "scope": "control",
@@ -473,8 +424,6 @@
     "logout revokes current refresh token/session"
   ],
   "tables": [
-    "users",
-    "company_users",
     "email_verifications",
     "password_setup_tokens",
     "password_reset_tokens"

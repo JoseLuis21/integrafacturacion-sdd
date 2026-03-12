@@ -1,0 +1,500 @@
+{
+  "module": "user",
+  "entity": "User",
+  "table": "users",
+  "description": "Platform user administration and company membership management",
+  "scope": "control",
+  "database": {
+    "owner": "user",
+    "tables": [
+      {
+        "name": "users",
+        "owner": "user",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "email", "type": "varchar(255)", "nullable": false },
+          { "name": "email_normalized", "type": "varchar(255)", "nullable": false },
+          { "name": "password_hash", "type": "varchar(255)", "nullable": true },
+          { "name": "password_set_at", "type": "timestamptz", "nullable": true },
+          { "name": "first_name", "type": "varchar(120)", "nullable": true },
+          { "name": "last_name", "type": "varchar(120)", "nullable": true },
+          { "name": "phone", "type": "varchar(40)", "nullable": true },
+          { "name": "locale", "type": "varchar(20)", "nullable": false, "default": "es-CL" },
+          { "name": "status", "type": "varchar(50)", "nullable": false },
+          { "name": "last_login_at", "type": "timestamptz", "nullable": true },
+          { "name": "created_at", "type": "timestamptz", "nullable": false },
+          { "name": "updated_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_users_email", "columns": ["email"], "unique": true },
+          { "name": "ux_users_email_normalized", "columns": ["email_normalized"], "unique": true },
+          { "name": "idx_users_status", "columns": ["status"], "unique": false }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "name": "company_users",
+        "owner": "user",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "company_id", "type": "uuid", "nullable": false },
+          { "name": "user_id", "type": "uuid", "nullable": false },
+          { "name": "status", "type": "varchar(50)", "nullable": false, "default": "invited" },
+          { "name": "joined_at", "type": "timestamptz", "nullable": true },
+          { "name": "invited_at", "type": "timestamptz", "nullable": true },
+          { "name": "created_at", "type": "timestamptz", "nullable": false },
+          { "name": "updated_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_company_users_company_user", "columns": ["company_id", "user_id"], "unique": true },
+          { "name": "idx_company_users_user_id", "columns": ["user_id"], "unique": false },
+          { "name": "idx_company_users_company_id", "columns": ["company_id"], "unique": false },
+          { "name": "idx_company_users_status", "columns": ["status"], "unique": false }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_company_users_user_id",
+            "column": "user_id",
+            "references": { "table": "users", "column": "id" },
+            "onDelete": "cascade"
+          },
+          {
+            "name": "fk_company_users_company_id",
+            "column": "company_id",
+            "references": { "table": "companies", "column": "id" },
+            "onDelete": "cascade"
+          }
+        ]
+      }
+    ],
+    "migrations": {
+      "enabled": true,
+      "runner": "embedded_sql",
+      "autoRunOnStartup": true,
+      "controlTable": "schema_migrations",
+      "namingPattern": "000001_init_user_schema.sql",
+      "seedsSeparated": true
+    }
+  },
+  "migrations": {
+    "enabled": true,
+    "strategy": "embedded_sql",
+    "autoRunOnStartup": true
+  },
+  "docker": {
+    "enabled": true,
+    "files": ["Dockerfile", "docker-compose.yml", ".dockerignore"],
+    "services": ["api", "postgres"],
+    "appPort": 8080,
+    "requiredEnv": [
+      "APP_ENV",
+      "APP_PORT",
+      "DB_HOST",
+      "DB_PORT",
+      "DB_USER",
+      "DB_PASSWORD",
+      "DB_NAME",
+      "DB_SSLMODE",
+      "DB_AUTO_MIGRATE"
+    ],
+    "healthcheck": {
+      "type": "http",
+      "path": "/health"
+    }
+  },
+  "postman": {
+    "enabled": true,
+    "collectionStrategy": "single_project_collection",
+    "collectionGroup": "user",
+    "environment": "local",
+    "files": [
+      "postman/base.postman_collection.json",
+      "postman/local.postman_environment.json"
+    ],
+    "variables": [
+      "baseUrl",
+      "accessToken",
+      "refreshToken",
+      "userId",
+      "companyId",
+      "resourceId"
+    ],
+    "captureAccessTokenFrom": "login",
+    "examplesPerAction": true
+  },
+  "makeTargets": [
+    "fmt",
+    "tidy",
+    "build",
+    "test",
+    "run",
+    "verify",
+    "docker-up",
+    "docker-down"
+  ],
+  "authTransport": {
+    "scheme": "Bearer",
+    "header": "Authorization"
+  },
+  "middlewareContract": {
+    "requiredForActions": [
+      "createUser",
+      "listUsers",
+      "getUserById",
+      "updateUser",
+      "blockUser",
+      "unblockUser",
+      "resendUserInvitation",
+      "listUserCompanyMemberships",
+      "createUserCompanyMembership",
+      "updateUserCompanyMembership",
+      "activateUserCompanyMembership",
+      "suspendUserCompanyMembership"
+    ],
+    "contextValues": ["userID", "email", "permissions"],
+    "tokenValidatedIn": "http_middleware",
+    "handlersReadFrom": "fiber_locals",
+    "unauthorizedErrorCode": "UNAUTHORIZED",
+    "unauthorizedResponse": {
+      "httpStatus": 401,
+      "body": {
+        "success": false,
+        "message": "Unauthorized",
+        "error": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    }
+  },
+  "statusPolicies": {
+    "user": {
+      "invited": {
+        "canLoginWithPassword": false
+      },
+      "active": {
+        "canLoginWithPassword": true
+      },
+      "blocked": {
+        "canLoginWithPassword": false
+      },
+      "pending_email_verification": {
+        "canLoginWithPassword": false
+      }
+    },
+    "membership": {
+      "invited": {
+        "tenantAccessAllowed": false
+      },
+      "active": {
+        "tenantAccessAllowed": true
+      },
+      "suspended": {
+        "tenantAccessAllowed": false
+      }
+    }
+  },
+  "examples": {
+    "requests": [
+      {
+        "action": "createUser",
+        "name": "inviteDefault",
+        "body": {
+          "email": "equipo@demo.cl",
+          "firstName": "Ana",
+          "lastName": "Pérez",
+          "phone": "+56 9 1234 5678",
+          "locale": "es-CL",
+          "sendInvitation": true,
+          "memberships": [
+            {
+              "companyId": "<company-id>",
+              "status": "invited"
+            }
+          ]
+        }
+      },
+      {
+        "action": "updateUser",
+        "name": "default",
+        "body": {
+          "firstName": "Ana María",
+          "lastName": "Pérez Soto",
+          "phone": "+56 9 8765 4321",
+          "locale": "es-CL"
+        }
+      },
+      {
+        "action": "createUserCompanyMembership",
+        "name": "default",
+        "body": {
+          "companyId": "<company-id>",
+          "status": "invited"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "action": "createUser",
+        "name": "success",
+        "status": 201,
+        "body": {
+          "success": true,
+          "data": {
+            "id": "<user-id>",
+            "email": "equipo@demo.cl",
+            "status": "invited",
+            "membershipsCreated": 1
+          }
+        }
+      },
+      {
+        "action": "getUserById",
+        "name": "success",
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "id": "<user-id>",
+            "email": "equipo@demo.cl",
+            "firstName": "Ana",
+            "lastName": "Pérez",
+            "fullName": "Ana Pérez",
+            "status": "active",
+            "memberships": [
+              {
+                "id": "<membership-id>",
+                "companyId": "<company-id>",
+                "status": "active"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "action": "blockUser",
+        "name": "success",
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "id": "<user-id>",
+            "status": "blocked"
+          }
+        }
+      }
+    ]
+  },
+  "permissions": [
+    "users.read",
+    "users.create",
+    "users.update",
+    "users.block",
+    "users.unblock",
+    "users.invite",
+    "company_users.read",
+    "company_users.create",
+    "company_users.update"
+  ],
+  "fields": [
+    {
+      "name": "id",
+      "type": "uuid",
+      "primary": true,
+      "required": true
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "emailNormalized",
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "firstName",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "lastName",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "fullName",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "phone",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "required": false,
+      "default": "es-CL"
+    },
+    {
+      "name": "status",
+      "type": "enum",
+      "required": true,
+      "values": ["invited", "active", "blocked", "pending_email_verification"]
+    },
+    {
+      "name": "memberships",
+      "type": "array",
+      "required": false
+    }
+  ],
+  "actions": [
+    {
+      "name": "createUser",
+      "method": "POST",
+      "path": "/api/v1/users",
+      "authRequired": true,
+      "permissions": ["users.create"]
+    },
+    {
+      "name": "listUsers",
+      "method": "GET",
+      "path": "/api/v1/users",
+      "authRequired": true,
+      "permissions": ["users.read"]
+    },
+    {
+      "name": "getUserById",
+      "method": "GET",
+      "path": "/api/v1/users/:id",
+      "authRequired": true,
+      "permissions": ["users.read"]
+    },
+    {
+      "name": "updateUser",
+      "method": "PATCH",
+      "path": "/api/v1/users/:id",
+      "authRequired": true,
+      "permissions": ["users.update"]
+    },
+    {
+      "name": "blockUser",
+      "method": "POST",
+      "path": "/api/v1/users/:id/block",
+      "authRequired": true,
+      "permissions": ["users.block"]
+    },
+    {
+      "name": "unblockUser",
+      "method": "POST",
+      "path": "/api/v1/users/:id/unblock",
+      "authRequired": true,
+      "permissions": ["users.unblock"]
+    },
+    {
+      "name": "resendUserInvitation",
+      "method": "POST",
+      "path": "/api/v1/users/:id/resend-invitation",
+      "authRequired": true,
+      "permissions": ["users.invite"]
+    },
+    {
+      "name": "listUserCompanyMemberships",
+      "method": "GET",
+      "path": "/api/v1/users/:id/company-memberships",
+      "authRequired": true,
+      "permissions": ["company_users.read"]
+    },
+    {
+      "name": "createUserCompanyMembership",
+      "method": "POST",
+      "path": "/api/v1/users/:id/company-memberships",
+      "authRequired": true,
+      "permissions": ["company_users.create"]
+    },
+    {
+      "name": "updateUserCompanyMembership",
+      "method": "PATCH",
+      "path": "/api/v1/users/:id/company-memberships/:membershipId",
+      "authRequired": true,
+      "permissions": ["company_users.update"]
+    },
+    {
+      "name": "activateUserCompanyMembership",
+      "method": "POST",
+      "path": "/api/v1/users/:id/company-memberships/:membershipId/activate",
+      "authRequired": true,
+      "permissions": ["company_users.update"]
+    },
+    {
+      "name": "suspendUserCompanyMembership",
+      "method": "POST",
+      "path": "/api/v1/users/:id/company-memberships/:membershipId/suspend",
+      "authRequired": true,
+      "permissions": ["company_users.update"]
+    }
+  ],
+  "rules": [
+    "use user as the canonical module name and users as the HTTP resource path",
+    "user master data belongs to the control database",
+    "email must be normalized before persistence and lookup",
+    "email_normalized must be unique",
+    "invited users may exist without password set",
+    "invitation flow must request password setup token creation from auth",
+    "a user may belong to multiple companies",
+    "company membership must be unique per user_id and company_id",
+    "only membership status active grants tenant access",
+    "blocked users cannot access tenant-scoped modules even if memberships are active",
+    "resend invitation is allowed only while onboarding is incomplete"
+  ],
+  "tables": [
+    "users",
+    "company_users"
+  ],
+  "dependencies": [
+    "companies",
+    "auth invitation flow",
+    "auth mail delivery",
+    "email normalizer",
+    "audit logger"
+  ],
+  "errors": [
+    { "code": "EMAIL_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "USER_NOT_FOUND", "httpStatus": 404 },
+    { "code": "COMPANY_NOT_FOUND", "httpStatus": 404 },
+    { "code": "MEMBERSHIP_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "MEMBERSHIP_NOT_FOUND", "httpStatus": 404 },
+    { "code": "INVALID_USER_STATUS", "httpStatus": 422 },
+    { "code": "INVALID_MEMBERSHIP_STATUS", "httpStatus": 422 },
+    { "code": "INVITATION_NOT_ALLOWED", "httpStatus": 422 },
+    { "code": "FORBIDDEN", "httpStatus": 403 },
+    { "code": "VALIDATION_ERROR", "httpStatus": 400 },
+    { "code": "UNAUTHORIZED", "httpStatus": 401 }
+  ],
+  "auditEvents": [
+    "user_created",
+    "user_invited",
+    "user_updated",
+    "user_blocked",
+    "user_unblocked",
+    "user_invitation_resent",
+    "company_membership_created",
+    "company_membership_updated",
+    "company_membership_activated",
+    "company_membership_suspended"
+  ],
+  "ui": {
+    "pages": [
+      "list",
+      "create",
+      "detail",
+      "memberships"
+    ]
+  }
+}

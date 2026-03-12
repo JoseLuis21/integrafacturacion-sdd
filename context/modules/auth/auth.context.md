@@ -18,8 +18,8 @@ Auth handles authentication and account access for platform users.
 
 ## Main Entities
 
-- User
-- CompanyUser
+- User (owned by the `user` module)
+- CompanyUser (owned by the `user` module)
 - EmailVerification
 - PasswordSetupToken
 - PasswordResetToken

@@ -40,7 +40,7 @@ Use `company` as the canonical module name.
 Reasons:
 
 - the repository already uses `company_id`
-- the auth module already uses `company_users`
+- the platform already uses `company_users`
 - `company` is clearer and more consistent than mixing `business` and `company`
 
 ---
@@ -530,8 +530,8 @@ Tables typically owned by this module:
 
 Related tables owned by other modules:
 
-- `users` from `auth`
-- `company_users` from `auth`
+- `users` from `user`
+- `company_users` from `user`
 
 Tenant-side consequence of this module:
 

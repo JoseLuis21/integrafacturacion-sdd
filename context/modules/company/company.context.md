@@ -36,7 +36,7 @@ It is the canonical module for creating a tenant company in the platform.
 - Main branch address must include Chilean location data: commune, city, region, and country `CL`.
 - `default_currency` defaults to `CLP`, `locale` to `es-CL`, and `timezone` to `America/Santiago`.
 - `sii_resolution_number`, `sii_resolution_date`, and `dte_email` are optional during onboarding but required before enabling production DTE flows.
-- Creating a company must also create or request the owner membership in `company_users`.
+- Creating a company must also create or request the owner membership in `company_users` through the `user` module.
 - Tenant access requires both active company membership and tenant provisioning status `ready`.
 
 ## Main Endpoints
@@ -109,4 +109,3 @@ src/modules/company/
 - `src/app/(dashboard)/companies/new/`
 - `src/app/(dashboard)/companies/[companyId]/`
 - `src/app/(dashboard)/companies/[companyId]/branches/`
-

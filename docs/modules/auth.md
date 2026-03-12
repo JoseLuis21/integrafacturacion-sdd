@@ -58,6 +58,8 @@ This module does **not** include:
 
 Represents a platform user account.
 
+This entity is owned by the `user` module and consumed by `auth`.
+
 Typical fields:
 
 - id
@@ -80,6 +82,8 @@ Typical fields:
 ## CompanyUser
 
 Represents the relationship between a user and a company/workspace.
+
+This relationship is owned by the `user` module and consumed by `auth`.
 
 Typical fields:
 
@@ -434,7 +438,7 @@ Password setup tokens are created outside the public auth endpoints.
 
 ## Owner
 
-- created by the user invitation flow in the users/company-users module
+- created by the user invitation flow in the `user` module
 
 ## Delivery
 
@@ -474,8 +478,8 @@ Authenticate a user with email and password.
     "companies": [
       {
         "id": "018f....",
-        "name": "AirConnect",
-        "slug": "airconnect"
+        "legalName": "AirConnect SpA",
+        "tenantCode": "airconnect"
       }
     ],
     "accessToken": "jwt-token"
@@ -521,8 +525,8 @@ Yes. Use `Authorization: Bearer <access-token>`.
     "companies": [
       {
         "id": "018f....",
-        "name": "AirConnect",
-        "slug": "airconnect"
+        "legalName": "AirConnect SpA",
+        "tenantCode": "airconnect"
       }
     ]
   }
@@ -655,13 +659,16 @@ Other user-management permissions belong to other modules, such as:
 
 This module belongs to the **control database**.
 
-Tables typically used:
+Tables owned by this module:
 
-- `users`
-- `company_users`
 - `email_verifications`
 - `password_setup_tokens`
 - `password_reset_tokens`
+
+Related tables owned by other modules:
+
+- `users` from `user`
+- `company_users` from `user`
 
 Optional supporting tables:
 

@@ -726,7 +726,7 @@
     "active tenant access requires active company status plus provisioning ready",
     "activation is not allowed while provisioning status is pending, provisioning, or failed",
     "retry tenant provisioning is allowed only from failed status",
-    "creating a company must create or request owner membership in company_users",
+    "creating a company must create or request owner membership in company_users through the user module",
     "sii_resolution_number, sii_resolution_date, and dte_email are required before production DTE flows"
   ],
   "tables": [

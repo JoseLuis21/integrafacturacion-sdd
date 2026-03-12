@@ -37,6 +37,19 @@ Typical responsibilities:
 - manage branches
 - provision tenant schema
 
+## user
+
+**Purpose:** user administration and company membership management
+**Docs:** `docs/modules/user.md`
+**Spec:** `specs/modules/user/module.json`
+**Context:** `context/modules/user/user.context.md`
+
+Typical responsibilities:
+
+- create or invite users
+- manage user status
+- manage company memberships
+
 # Recommended Reading Order
 
 For new contributors, a useful reading sequence is:
