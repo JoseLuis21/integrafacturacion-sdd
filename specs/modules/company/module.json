@@ -1,0 +1,784 @@
+{
+  "module": "company",
+  "entity": "Company",
+  "table": "companies",
+  "description": "Company onboarding, Chilean tax profile management, and tenant schema provisioning",
+  "scope": "control",
+  "database": {
+    "owner": "company",
+    "tables": [
+      {
+        "name": "companies",
+        "owner": "company",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "tenant_code", "type": "varchar(80)", "nullable": false },
+          { "name": "tenant_schema", "type": "varchar(120)", "nullable": false },
+          { "name": "rut", "type": "varchar(20)", "nullable": false },
+          { "name": "rut_normalized", "type": "varchar(12)", "nullable": false },
+          { "name": "legal_name", "type": "varchar(255)", "nullable": false },
+          { "name": "trade_name", "type": "varchar(255)", "nullable": true },
+          { "name": "status", "type": "varchar(50)", "nullable": false, "default": "onboarding" },
+          { "name": "onboarding_status", "type": "varchar(50)", "nullable": false, "default": "provisioning" },
+          { "name": "primary_giro", "type": "varchar(255)", "nullable": false },
+          { "name": "sii_environment", "type": "varchar(30)", "nullable": false, "default": "certification" },
+          { "name": "sii_resolution_number", "type": "varchar(30)", "nullable": true },
+          { "name": "sii_resolution_date", "type": "date", "nullable": true },
+          { "name": "dte_email", "type": "varchar(255)", "nullable": true },
+          { "name": "contact_email", "type": "varchar(255)", "nullable": false },
+          { "name": "billing_email", "type": "varchar(255)", "nullable": true },
+          { "name": "phone", "type": "varchar(40)", "nullable": true },
+          { "name": "website", "type": "varchar(255)", "nullable": true },
+          { "name": "logo_url", "type": "varchar(500)", "nullable": true },
+          { "name": "default_currency", "type": "varchar(10)", "nullable": false, "default": "CLP" },
+          { "name": "locale", "type": "varchar(20)", "nullable": false, "default": "es-CL" },
+          { "name": "timezone", "type": "varchar(60)", "nullable": false, "default": "America/Santiago" },
+          { "name": "created_by_user_id", "type": "uuid", "nullable": false },
+          { "name": "activated_at", "type": "timestamptz", "nullable": true },
+          { "name": "suspended_at", "type": "timestamptz", "nullable": true },
+          { "name": "created_at", "type": "timestamptz", "nullable": false },
+          { "name": "updated_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_companies_rut_normalized", "columns": ["rut_normalized"], "unique": true },
+          { "name": "ux_companies_tenant_code", "columns": ["tenant_code"], "unique": true },
+          { "name": "ux_companies_tenant_schema", "columns": ["tenant_schema"], "unique": true },
+          { "name": "idx_companies_status", "columns": ["status"], "unique": false },
+          { "name": "idx_companies_created_by_user_id", "columns": ["created_by_user_id"], "unique": false }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_companies_created_by_user_id",
+            "column": "created_by_user_id",
+            "references": { "table": "users", "column": "id" },
+            "onDelete": "restrict"
+          }
+        ]
+      },
+      {
+        "name": "company_branches",
+        "owner": "company",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "company_id", "type": "uuid", "nullable": false },
+          { "name": "branch_name", "type": "varchar(150)", "nullable": false },
+          { "name": "branch_type", "type": "varchar(30)", "nullable": false, "default": "branch" },
+          { "name": "sii_branch_code", "type": "varchar(20)", "nullable": true },
+          { "name": "is_default", "type": "boolean", "nullable": false, "default": false },
+          { "name": "status", "type": "varchar(30)", "nullable": false, "default": "active" },
+          { "name": "email", "type": "varchar(255)", "nullable": true },
+          { "name": "phone", "type": "varchar(40)", "nullable": true },
+          { "name": "street", "type": "varchar(150)", "nullable": false },
+          { "name": "street_number", "type": "varchar(20)", "nullable": false },
+          { "name": "address_line2", "type": "varchar(150)", "nullable": true },
+          { "name": "commune_code", "type": "varchar(20)", "nullable": false },
+          { "name": "commune_name", "type": "varchar(120)", "nullable": false },
+          { "name": "city", "type": "varchar(120)", "nullable": false },
+          { "name": "region_code", "type": "varchar(20)", "nullable": false },
+          { "name": "region_name", "type": "varchar(120)", "nullable": false },
+          { "name": "country_code", "type": "varchar(2)", "nullable": false, "default": "CL" },
+          { "name": "postal_code", "type": "varchar(20)", "nullable": true },
+          { "name": "created_at", "type": "timestamptz", "nullable": false },
+          { "name": "updated_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "idx_company_branches_company_id", "columns": ["company_id"], "unique": false },
+          { "name": "ux_company_branches_company_branch_name", "columns": ["company_id", "branch_name"], "unique": true },
+          { "name": "ux_company_branches_company_sii_branch_code", "columns": ["company_id", "sii_branch_code"], "unique": true }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_company_branches_company_id",
+            "column": "company_id",
+            "references": { "table": "companies", "column": "id" },
+            "onDelete": "cascade"
+          }
+        ]
+      },
+      {
+        "name": "company_economic_activities",
+        "owner": "company",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "company_id", "type": "uuid", "nullable": false },
+          { "name": "sii_activity_code", "type": "varchar(10)", "nullable": false },
+          { "name": "activity_name", "type": "varchar(255)", "nullable": false },
+          { "name": "is_primary", "type": "boolean", "nullable": false, "default": false },
+          { "name": "created_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_company_economic_activities_company_code", "columns": ["company_id", "sii_activity_code"], "unique": true },
+          { "name": "idx_company_economic_activities_company_primary", "columns": ["company_id", "is_primary"], "unique": false }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_company_economic_activities_company_id",
+            "column": "company_id",
+            "references": { "table": "companies", "column": "id" },
+            "onDelete": "cascade"
+          }
+        ]
+      },
+      {
+        "name": "company_tenant_provisioning",
+        "owner": "company",
+        "scope": "control",
+        "columns": [
+          { "name": "company_id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "tenant_schema", "type": "varchar(120)", "nullable": false },
+          { "name": "provisioning_status", "type": "varchar(50)", "nullable": false, "default": "pending" },
+          { "name": "bootstrap_version", "type": "varchar(50)", "nullable": false, "default": "v1" },
+          { "name": "requested_by_user_id", "type": "uuid", "nullable": true },
+          { "name": "started_at", "type": "timestamptz", "nullable": true },
+          { "name": "finished_at", "type": "timestamptz", "nullable": true },
+          { "name": "last_error_code", "type": "varchar(100)", "nullable": true },
+          { "name": "last_error_message", "type": "text", "nullable": true },
+          { "name": "created_at", "type": "timestamptz", "nullable": false },
+          { "name": "updated_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_company_tenant_provisioning_tenant_schema", "columns": ["tenant_schema"], "unique": true },
+          { "name": "idx_company_tenant_provisioning_status", "columns": ["provisioning_status"], "unique": false }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_company_tenant_provisioning_company_id",
+            "column": "company_id",
+            "references": { "table": "companies", "column": "id" },
+            "onDelete": "cascade"
+          },
+          {
+            "name": "fk_company_tenant_provisioning_requested_by_user_id",
+            "column": "requested_by_user_id",
+            "references": { "table": "users", "column": "id" },
+            "onDelete": "set null"
+          }
+        ]
+      }
+    ],
+    "migrations": {
+      "enabled": true,
+      "runner": "embedded_sql",
+      "autoRunOnStartup": true,
+      "controlTable": "schema_migrations",
+      "namingPattern": "000001_init_company_schema.sql",
+      "seedsSeparated": true
+    }
+  },
+  "migrations": {
+    "enabled": true,
+    "strategy": "embedded_sql",
+    "autoRunOnStartup": true
+  },
+  "docker": {
+    "enabled": true,
+    "files": ["Dockerfile", "docker-compose.yml", ".dockerignore"],
+    "services": ["api", "postgres"],
+    "appPort": 8080,
+    "requiredEnv": [
+      "APP_ENV",
+      "APP_PORT",
+      "DB_HOST",
+      "DB_PORT",
+      "DB_USER",
+      "DB_PASSWORD",
+      "DB_NAME",
+      "DB_SSLMODE",
+      "DB_AUTO_MIGRATE"
+    ],
+    "healthcheck": {
+      "type": "http",
+      "path": "/health"
+    }
+  },
+  "postman": {
+    "enabled": true,
+    "collectionStrategy": "single_project_collection",
+    "collectionGroup": "company",
+    "environment": "local",
+    "files": [
+      "postman/base.postman_collection.json",
+      "postman/local.postman_environment.json"
+    ],
+    "variables": [
+      "baseUrl",
+      "accessToken",
+      "refreshToken",
+      "userId",
+      "companyId",
+      "resourceId"
+    ],
+    "captureAccessTokenFrom": "login",
+    "examplesPerAction": true
+  },
+  "makeTargets": [
+    "fmt",
+    "tidy",
+    "build",
+    "test",
+    "run",
+    "verify",
+    "docker-up",
+    "docker-down"
+  ],
+  "authTransport": {
+    "scheme": "Bearer",
+    "header": "Authorization"
+  },
+  "middlewareContract": {
+    "requiredForActions": [
+      "createCompany",
+      "listCompanies",
+      "getMyCompanies",
+      "getCompanyById",
+      "updateCompany",
+      "activateCompany",
+      "suspendCompany",
+      "getTenantProvisioning",
+      "retryTenantProvisioning",
+      "listBranches",
+      "createBranch",
+      "updateBranch",
+      "setDefaultBranch"
+    ],
+    "contextValues": ["userID", "email", "permissions"],
+    "tokenValidatedIn": "http_middleware",
+    "handlersReadFrom": "fiber_locals",
+    "unauthorizedErrorCode": "UNAUTHORIZED",
+    "unauthorizedResponse": {
+      "httpStatus": 401,
+      "body": {
+        "success": false,
+        "message": "Unauthorized",
+        "error": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    }
+  },
+  "tenantProvisioning": {
+    "strategy": "control_database_plus_tenant_schema",
+    "schemaNamePattern": "tenant_<tenant_code>",
+    "searchPathTemplate": "SET search_path TO <tenant_schema>, public",
+    "createSchemaOnCompanyCreation": true,
+    "runBaseTenantMigrations": true,
+    "seedCompanyProfileInTenantSchema": true,
+    "ownerMembershipCreatedOnCompanyCreation": true,
+    "statuses": ["pending", "provisioning", "ready", "failed"]
+  },
+  "chileProfile": {
+    "defaultCountryCode": "CL",
+    "defaultCurrency": "CLP",
+    "defaultLocale": "es-CL",
+    "defaultTimezone": "America/Santiago",
+    "validateRut": true,
+    "siiEnvironments": ["certification", "production"],
+    "requiredAddressFields": [
+      "street",
+      "streetNumber",
+      "communeCode",
+      "communeName",
+      "city",
+      "regionCode",
+      "regionName",
+      "countryCode"
+    ],
+    "requiredForProductionDTE": [
+      "primaryGiro",
+      "dteEmail",
+      "siiResolutionNumber",
+      "siiResolutionDate",
+      "mainBranch",
+      "economicActivities"
+    ]
+  },
+  "statusPolicies": {
+    "company": {
+      "onboarding": {
+        "tenantAccessAllowed": false
+      },
+      "active": {
+        "tenantAccessAllowed": true
+      },
+      "suspended": {
+        "tenantAccessAllowed": false
+      },
+      "archived": {
+        "tenantAccessAllowed": false
+      }
+    },
+    "provisioning": {
+      "pending": {
+        "activatable": false
+      },
+      "provisioning": {
+        "activatable": false
+      },
+      "ready": {
+        "activatable": true
+      },
+      "failed": {
+        "activatable": false
+      }
+    },
+    "branch": {
+      "active": {
+        "usableForDTE": true
+      },
+      "inactive": {
+        "usableForDTE": false
+      }
+    }
+  },
+  "examples": {
+    "requests": [
+      {
+        "action": "createCompany",
+        "name": "default",
+        "body": {
+          "legalName": "Comercializadora Demo SpA",
+          "tradeName": "Demo ERP",
+          "rut": "76.123.456-7",
+          "primaryGiro": "Actividades de programacion informatica",
+          "siiEnvironment": "certification",
+          "siiResolutionNumber": null,
+          "siiResolutionDate": null,
+          "dteEmail": "dte@demo.cl",
+          "contactEmail": "contacto@demo.cl",
+          "billingEmail": "facturacion@demo.cl",
+          "phone": "+56 9 1234 5678",
+          "website": "https://demo.cl",
+          "requestedTenantCode": "demo",
+          "economicActivities": [
+            {
+              "code": "620100",
+              "name": "Actividades de programacion informatica",
+              "isPrimary": true
+            }
+          ],
+          "mainBranch": {
+            "branchName": "Casa Matriz",
+            "branchType": "main",
+            "siiBranchCode": "00000",
+            "email": "casa.matriz@demo.cl",
+            "phone": "+56 2 2234 5678",
+            "street": "Avenida Apoquindo",
+            "streetNumber": "3000",
+            "addressLine2": "Oficina 701",
+            "communeCode": "13114",
+            "communeName": "Las Condes",
+            "city": "Santiago",
+            "regionCode": "RM",
+            "regionName": "Metropolitana de Santiago",
+            "countryCode": "CL",
+            "postalCode": "7550000"
+          }
+        }
+      },
+      {
+        "action": "updateCompany",
+        "name": "enableProductionDTE",
+        "body": {
+          "siiEnvironment": "production",
+          "siiResolutionNumber": "80",
+          "siiResolutionDate": "2024-01-15",
+          "dteEmail": "dte@demo.cl",
+          "billingEmail": "facturacion@demo.cl"
+        }
+      },
+      {
+        "action": "createBranch",
+        "name": "secondaryBranch",
+        "body": {
+          "branchName": "Sucursal Providencia",
+          "branchType": "branch",
+          "siiBranchCode": "00001",
+          "email": "providencia@demo.cl",
+          "phone": "+56 2 2987 6543",
+          "street": "Avenida Nueva Providencia",
+          "streetNumber": "1200",
+          "addressLine2": "Local 5",
+          "communeCode": "13123",
+          "communeName": "Providencia",
+          "city": "Santiago",
+          "regionCode": "RM",
+          "regionName": "Metropolitana de Santiago",
+          "countryCode": "CL",
+          "postalCode": "7500000"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "action": "createCompany",
+        "name": "success",
+        "status": 201,
+        "body": {
+          "success": true,
+          "data": {
+            "id": "<company-id>",
+            "tenantCode": "demo",
+            "tenantSchema": "tenant_demo",
+            "status": "onboarding",
+            "onboardingStatus": "provisioning",
+            "provisioningStatus": "pending"
+          }
+        }
+      },
+      {
+        "action": "getMyCompanies",
+        "name": "success",
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": [
+            {
+              "id": "<company-id>",
+              "legalName": "Comercializadora Demo SpA",
+              "tradeName": "Demo ERP",
+              "rut": "76.123.456-7",
+              "status": "active",
+              "tenantSchema": "tenant_demo"
+            }
+          ]
+        }
+      },
+      {
+        "action": "getTenantProvisioning",
+        "name": "ready",
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "companyId": "<company-id>",
+            "tenantSchema": "tenant_demo",
+            "provisioningStatus": "ready",
+            "bootstrapVersion": "v1",
+            "startedAt": "2026-03-12T10:00:00Z",
+            "finishedAt": "2026-03-12T10:00:06Z"
+          }
+        }
+      },
+      {
+        "action": "retryTenantProvisioning",
+        "name": "accepted",
+        "status": 202,
+        "body": {
+          "success": true,
+          "data": {
+            "companyId": "<company-id>",
+            "provisioningStatus": "provisioning"
+          }
+        }
+      }
+    ]
+  },
+  "permissions": [
+    "company.read",
+    "company.create",
+    "company.update",
+    "company.activate",
+    "company.suspend",
+    "company.branch.read",
+    "company.branch.create",
+    "company.branch.update",
+    "company.tenant.read",
+    "company.tenant.retry"
+  ],
+  "fields": [
+    {
+      "name": "id",
+      "type": "uuid",
+      "primary": true,
+      "required": true
+    },
+    {
+      "name": "tenantCode",
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "tenantSchema",
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "rut",
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "format": "chilean_rut"
+    },
+    {
+      "name": "rutNormalized",
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "legalName",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "tradeName",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "status",
+      "type": "enum",
+      "required": true,
+      "values": ["onboarding", "active", "suspended", "archived"]
+    },
+    {
+      "name": "onboardingStatus",
+      "type": "enum",
+      "required": true,
+      "values": ["pending", "provisioning", "ready", "failed"]
+    },
+    {
+      "name": "primaryGiro",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "siiEnvironment",
+      "type": "enum",
+      "required": true,
+      "values": ["certification", "production"]
+    },
+    {
+      "name": "siiResolutionNumber",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "siiResolutionDate",
+      "type": "date",
+      "required": false
+    },
+    {
+      "name": "dteEmail",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "contactEmail",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "billingEmail",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "phone",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "website",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "defaultCurrency",
+      "type": "string",
+      "required": false,
+      "default": "CLP"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "required": false,
+      "default": "es-CL"
+    },
+    {
+      "name": "timezone",
+      "type": "string",
+      "required": false,
+      "default": "America/Santiago"
+    },
+    {
+      "name": "mainBranch",
+      "type": "object",
+      "required": true
+    },
+    {
+      "name": "economicActivities",
+      "type": "array",
+      "required": true
+    }
+  ],
+  "actions": [
+    {
+      "name": "createCompany",
+      "method": "POST",
+      "path": "/api/v1/companies",
+      "authRequired": true,
+      "permissions": ["company.create"]
+    },
+    {
+      "name": "listCompanies",
+      "method": "GET",
+      "path": "/api/v1/companies",
+      "authRequired": true,
+      "permissions": ["company.read"]
+    },
+    {
+      "name": "getMyCompanies",
+      "method": "GET",
+      "path": "/api/v1/companies/me",
+      "authRequired": true,
+      "permissions": ["company.read"]
+    },
+    {
+      "name": "getCompanyById",
+      "method": "GET",
+      "path": "/api/v1/companies/:id",
+      "authRequired": true,
+      "permissions": ["company.read"]
+    },
+    {
+      "name": "updateCompany",
+      "method": "PATCH",
+      "path": "/api/v1/companies/:id",
+      "authRequired": true,
+      "permissions": ["company.update"]
+    },
+    {
+      "name": "activateCompany",
+      "method": "POST",
+      "path": "/api/v1/companies/:id/activate",
+      "authRequired": true,
+      "permissions": ["company.activate"]
+    },
+    {
+      "name": "suspendCompany",
+      "method": "POST",
+      "path": "/api/v1/companies/:id/suspend",
+      "authRequired": true,
+      "permissions": ["company.suspend"]
+    },
+    {
+      "name": "getTenantProvisioning",
+      "method": "GET",
+      "path": "/api/v1/companies/:id/tenant-provisioning",
+      "authRequired": true,
+      "permissions": ["company.tenant.read"]
+    },
+    {
+      "name": "retryTenantProvisioning",
+      "method": "POST",
+      "path": "/api/v1/companies/:id/retry-tenant-provisioning",
+      "authRequired": true,
+      "permissions": ["company.tenant.retry"]
+    },
+    {
+      "name": "listBranches",
+      "method": "GET",
+      "path": "/api/v1/companies/:id/branches",
+      "authRequired": true,
+      "permissions": ["company.branch.read"]
+    },
+    {
+      "name": "createBranch",
+      "method": "POST",
+      "path": "/api/v1/companies/:id/branches",
+      "authRequired": true,
+      "permissions": ["company.branch.create"]
+    },
+    {
+      "name": "updateBranch",
+      "method": "PATCH",
+      "path": "/api/v1/companies/:id/branches/:branchId",
+      "authRequired": true,
+      "permissions": ["company.branch.update"]
+    },
+    {
+      "name": "setDefaultBranch",
+      "method": "POST",
+      "path": "/api/v1/companies/:id/branches/:branchId/set-default",
+      "authRequired": true,
+      "permissions": ["company.branch.update"]
+    }
+  ],
+  "rules": [
+    "use company as the canonical term across modules and specs",
+    "company master data belongs to the control database",
+    "each company maps to exactly one tenant schema",
+    "rut must be normalized and validated before persistence",
+    "rut_normalized must be unique",
+    "tenant_code must be unique and URL-safe",
+    "tenant_schema must follow tenant_<tenant_code> and be unique",
+    "tenant_schema becomes immutable after provisioning status is ready",
+    "company creation requires one main branch",
+    "company creation requires at least one economic activity",
+    "exactly one economic activity must be primary",
+    "main branch country_code must be CL",
+    "active tenant access requires active company status plus provisioning ready",
+    "activation is not allowed while provisioning status is pending, provisioning, or failed",
+    "retry tenant provisioning is allowed only from failed status",
+    "creating a company must create or request owner membership in company_users",
+    "sii_resolution_number, sii_resolution_date, and dte_email are required before production DTE flows"
+  ],
+  "tables": [
+    "companies",
+    "company_branches",
+    "company_economic_activities",
+    "company_tenant_provisioning"
+  ],
+  "dependencies": [
+    "users",
+    "company_users",
+    "tenant schema provisioner",
+    "embedded SQL migration runner",
+    "RUT validator",
+    "Chile location catalog",
+    "SII economic activity catalog",
+    "audit logger"
+  ],
+  "errors": [
+    { "code": "INVALID_RUT", "httpStatus": 422 },
+    { "code": "RUT_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "TENANT_CODE_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "TENANT_SCHEMA_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "COMPANY_NOT_FOUND", "httpStatus": 404 },
+    { "code": "BRANCH_NOT_FOUND", "httpStatus": 404 },
+    { "code": "FORBIDDEN", "httpStatus": 403 },
+    { "code": "INVALID_COMPANY_STATUS", "httpStatus": 422 },
+    { "code": "DEFAULT_BRANCH_REQUIRED", "httpStatus": 422 },
+    { "code": "PRIMARY_ACTIVITY_REQUIRED", "httpStatus": 422 },
+    { "code": "TENANT_PROVISIONING_FAILED", "httpStatus": 422 },
+    { "code": "VALIDATION_ERROR", "httpStatus": 400 },
+    { "code": "UNAUTHORIZED", "httpStatus": 401 }
+  ],
+  "auditEvents": [
+    "company_created",
+    "company_updated",
+    "company_activated",
+    "company_suspended",
+    "company_branch_created",
+    "company_branch_updated",
+    "tenant_provisioning_started",
+    "tenant_provisioning_failed",
+    "tenant_provisioning_ready"
+  ],
+  "ui": {
+    "pages": [
+      "list",
+      "my-companies",
+      "create",
+      "detail",
+      "edit",
+      "branches"
+    ]
+  }
+}

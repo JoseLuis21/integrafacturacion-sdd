@@ -23,6 +23,20 @@ Typical responsibilities:
 - verify email
 - reset password
 
+## company
+
+**Purpose:** company onboarding, Chilean tax profile, and tenant schema provisioning
+**Docs:** `docs/modules/company.md`
+**Spec:** `specs/modules/company/module.json`
+**Context:** `context/modules/company/company.context.md`
+
+Typical responsibilities:
+
+- create company
+- manage legal and tax profile
+- manage branches
+- provision tenant schema
+
 # Recommended Reading Order
 
 For new contributors, a useful reading sequence is:
