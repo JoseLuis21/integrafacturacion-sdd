@@ -112,6 +112,78 @@ CREATE TABLE public.company_tenant_provisioning (
 ALTER TABLE public.company_tenant_provisioning OWNER TO neondb_owner;
 
 --
+-- Name: permissions; Type: TABLE; Schema: public; Owner: neondb_owner
+--
+
+CREATE TABLE public.permissions (
+    id uuid NOT NULL,
+    code text NOT NULL,
+    module text NOT NULL,
+    action text NOT NULL,
+    scope text DEFAULT 'company'::text NOT NULL,
+    description text,
+    is_system boolean DEFAULT true NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT ck_permissions_scope CHECK ((scope = ANY (ARRAY['global'::text, 'company'::text])))
+);
+
+
+ALTER TABLE public.permissions OWNER TO neondb_owner;
+
+--
+-- Name: roles; Type: TABLE; Schema: public; Owner: neondb_owner
+--
+
+CREATE TABLE public.roles (
+    id uuid NOT NULL,
+    company_id uuid,
+    name text NOT NULL,
+    code text NOT NULL,
+    description text,
+    scope text NOT NULL,
+    status text DEFAULT 'active'::text NOT NULL,
+    is_system boolean DEFAULT false NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT ck_roles_scope CHECK ((scope = ANY (ARRAY['global'::text, 'company'::text]))),
+    CONSTRAINT ck_roles_status CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text]))),
+    CONSTRAINT ck_roles_scope_company_id CHECK ((((scope = 'global'::text) AND (company_id IS NULL)) OR ((scope = 'company'::text) AND (company_id IS NOT NULL))))
+);
+
+
+ALTER TABLE public.roles OWNER TO neondb_owner;
+
+--
+-- Name: role_permissions; Type: TABLE; Schema: public; Owner: neondb_owner
+--
+
+CREATE TABLE public.role_permissions (
+    id uuid NOT NULL,
+    role_id uuid NOT NULL,
+    permission_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.role_permissions OWNER TO neondb_owner;
+
+--
+-- Name: user_role_assignments; Type: TABLE; Schema: public; Owner: neondb_owner
+--
+
+CREATE TABLE public.user_role_assignments (
+    id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    role_id uuid NOT NULL,
+    assigned_by_user_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.user_role_assignments OWNER TO neondb_owner;
+
+--
 -- Name: company_users; Type: TABLE; Schema: public; Owner: neondb_owner
 --
 
@@ -249,6 +321,38 @@ ALTER TABLE ONLY public.company_tenant_provisioning
 
 
 --
+-- Name: permissions permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.permissions
+    ADD CONSTRAINT permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: role_permissions role_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.role_permissions
+    ADD CONSTRAINT role_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_role_assignments user_role_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.user_role_assignments
+    ADD CONSTRAINT user_role_assignments_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: company_users company_users_pkey; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
 --
 
@@ -353,6 +457,30 @@ ALTER TABLE ONLY public.company_tenant_provisioning
 
 
 --
+-- Name: permissions ux_permissions_code; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.permissions
+    ADD CONSTRAINT ux_permissions_code UNIQUE (code);
+
+
+--
+-- Name: role_permissions ux_role_permissions_role_permission; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.role_permissions
+    ADD CONSTRAINT ux_role_permissions_role_permission UNIQUE (role_id, permission_id);
+
+
+--
+-- Name: user_role_assignments ux_user_role_assignments_user_role; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.user_role_assignments
+    ADD CONSTRAINT ux_user_role_assignments_user_role UNIQUE (user_id, role_id);
+
+
+--
 -- Name: company_users ux_company_users_user_company; Type: CONSTRAINT; Schema: public; Owner: neondb_owner
 --
 
@@ -450,6 +578,69 @@ CREATE INDEX ix_company_tenant_provisioning_status ON public.company_tenant_prov
 
 
 --
+-- Name: ix_permissions_module; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE INDEX ix_permissions_module ON public.permissions USING btree (module);
+
+
+--
+-- Name: ix_permissions_scope; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE INDEX ix_permissions_scope ON public.permissions USING btree (scope);
+
+
+--
+-- Name: ix_roles_company_id; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE INDEX ix_roles_company_id ON public.roles USING btree (company_id);
+
+
+--
+-- Name: ix_roles_scope; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE INDEX ix_roles_scope ON public.roles USING btree (scope);
+
+
+--
+-- Name: ix_roles_status; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE INDEX ix_roles_status ON public.roles USING btree (status);
+
+
+--
+-- Name: ux_roles_global_code; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE UNIQUE INDEX ux_roles_global_code ON public.roles USING btree (code) WHERE (scope = 'global'::text);
+
+
+--
+-- Name: ux_roles_company_code; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE UNIQUE INDEX ux_roles_company_code ON public.roles USING btree (company_id, code) WHERE (scope = 'company'::text);
+
+
+--
+-- Name: ix_role_permissions_permission_id; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE INDEX ix_role_permissions_permission_id ON public.role_permissions USING btree (permission_id);
+
+
+--
+-- Name: ix_user_role_assignments_role_id; Type: INDEX; Schema: public; Owner: neondb_owner
+--
+
+CREATE INDEX ix_user_role_assignments_role_id ON public.user_role_assignments USING btree (role_id);
+
+
+--
 -- Name: ix_company_users_company_id; Type: INDEX; Schema: public; Owner: neondb_owner
 --
 
@@ -522,6 +713,54 @@ ALTER TABLE ONLY public.company_tenant_provisioning
 
 ALTER TABLE ONLY public.company_tenant_provisioning
     ADD CONSTRAINT company_tenant_provisioning_requested_by_user_id_fkey FOREIGN KEY (requested_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: roles roles_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id) ON DELETE CASCADE;
+
+
+--
+-- Name: role_permissions role_permissions_permission_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.role_permissions
+    ADD CONSTRAINT role_permissions_permission_id_fkey FOREIGN KEY (permission_id) REFERENCES public.permissions(id) ON DELETE CASCADE;
+
+
+--
+-- Name: role_permissions role_permissions_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.role_permissions
+    ADD CONSTRAINT role_permissions_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_role_assignments user_role_assignments_assigned_by_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.user_role_assignments
+    ADD CONSTRAINT user_role_assignments_assigned_by_user_id_fkey FOREIGN KEY (assigned_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: user_role_assignments user_role_assignments_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.user_role_assignments
+    ADD CONSTRAINT user_role_assignments_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_role_assignments user_role_assignments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: neondb_owner
+--
+
+ALTER TABLE ONLY public.user_role_assignments
+    ADD CONSTRAINT user_role_assignments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

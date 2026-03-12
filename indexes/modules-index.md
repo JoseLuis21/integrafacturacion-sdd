@@ -50,6 +50,20 @@ Typical responsibilities:
 - manage user status
 - manage company memberships
 
+## acl
+
+**Purpose:** authorization through roles, permissions, and effective permission checks
+**Docs:** `docs/modules/acl.md`
+**Spec:** `specs/modules/acl/module.json`
+**Context:** `context/modules/acl/acl.context.md`
+
+Typical responsibilities:
+
+- manage roles and role permissions
+- assign roles to users
+- resolve effective permissions
+- answer can checks
+
 # Recommended Reading Order
 
 For new contributors, a useful reading sequence is:

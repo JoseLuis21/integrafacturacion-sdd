@@ -37,6 +37,9 @@ It is the canonical module for creating a tenant company in the platform.
 - `default_currency` defaults to `CLP`, `locale` to `es-CL`, and `timezone` to `America/Santiago`.
 - `sii_resolution_number`, `sii_resolution_date`, and `dte_email` are optional during onboarding but required before enabling production DTE flows.
 - Creating a company must also create or request the owner membership in `company_users` through the `user` module.
+- Company creation requires the effective permission `company.create`.
+- `company.create` is evaluated as a global permission without company context.
+- By default, `company.create` is granted through the global `admin` role from the `acl` module.
 - Tenant access requires both active company membership and tenant provisioning status `ready`.
 
 ## Main Endpoints

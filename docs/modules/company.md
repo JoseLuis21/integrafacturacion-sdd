@@ -285,6 +285,12 @@ Suggested flow for `CreateCompanyUseCase`:
 8. Create owner membership in `company_users`.
 9. Mark provisioning as `ready` or `failed`.
 
+Authorization note:
+
+- `POST /api/v1/companies` requires effective permission `company.create`
+- `company.create` is evaluated without `companyId` because it is a global permission
+- by default this permission is granted through the global `admin` role from the `acl` module
+
 If provisioning fails:
 
 - keep the company in `onboarding`
@@ -515,6 +521,12 @@ Suggested permissions:
 - `company.tenant.read`
 - `company.tenant.retry`
 
+Default ACL policy:
+
+- only users with effective permission `company.create` may create companies
+- `company.create` is a global permission evaluated without company context
+- by default this means the global `admin` role
+
 ---
 
 # Data Ownership
@@ -547,6 +559,7 @@ The company record itself should remain the source of truth in the control layer
 The company module depends on:
 
 - auth middleware
+- ACL/effective-permission resolver
 - users repository
 - company_users repository or application service
 - tenant schema provisioner

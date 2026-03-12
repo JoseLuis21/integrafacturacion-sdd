@@ -727,7 +727,10 @@
     "activation is not allowed while provisioning status is pending, provisioning, or failed",
     "retry tenant provisioning is allowed only from failed status",
     "creating a company must create or request owner membership in company_users through the user module",
-    "sii_resolution_number, sii_resolution_date, and dte_email are required before production DTE flows"
+    "sii_resolution_number, sii_resolution_date, and dte_email are required before production DTE flows",
+    "company creation requires the effective permission company.create",
+    "company.create is evaluated without company context because it is a global permission",
+    "by default company.create is granted through the global admin role from the acl module"
   ],
   "tables": [
     "companies",
@@ -736,6 +739,7 @@
     "company_tenant_provisioning"
   ],
   "dependencies": [
+    "acl effective-permission resolver",
     "users",
     "company_users",
     "tenant schema provisioner",

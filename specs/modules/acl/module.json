@@ -1,0 +1,508 @@
+{
+  "module": "acl",
+  "entity": "Role",
+  "table": "roles",
+  "description": "Authorization through permissions, roles, role assignments, and effective permission resolution",
+  "scope": "control",
+  "database": {
+    "owner": "acl",
+    "tables": [
+      {
+        "name": "permissions",
+        "owner": "acl",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "code", "type": "varchar(150)", "nullable": false },
+          { "name": "module", "type": "varchar(80)", "nullable": false },
+          { "name": "action", "type": "varchar(80)", "nullable": false },
+          { "name": "scope", "type": "varchar(30)", "nullable": false, "default": "company" },
+          { "name": "description", "type": "text", "nullable": true },
+          { "name": "is_system", "type": "boolean", "nullable": false, "default": true },
+          { "name": "created_at", "type": "timestamptz", "nullable": false },
+          { "name": "updated_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_permissions_code", "columns": ["code"], "unique": true },
+          { "name": "idx_permissions_module", "columns": ["module"], "unique": false },
+          { "name": "idx_permissions_scope", "columns": ["scope"], "unique": false }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "name": "roles",
+        "owner": "acl",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "company_id", "type": "uuid", "nullable": true },
+          { "name": "name", "type": "varchar(120)", "nullable": false },
+          { "name": "code", "type": "varchar(120)", "nullable": false },
+          { "name": "description", "type": "text", "nullable": true },
+          { "name": "scope", "type": "varchar(30)", "nullable": false },
+          { "name": "status", "type": "varchar(30)", "nullable": false, "default": "active" },
+          { "name": "is_system", "type": "boolean", "nullable": false, "default": false },
+          { "name": "created_at", "type": "timestamptz", "nullable": false },
+          { "name": "updated_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "idx_roles_company_id", "columns": ["company_id"], "unique": false },
+          { "name": "idx_roles_scope", "columns": ["scope"], "unique": false },
+          { "name": "idx_roles_status", "columns": ["status"], "unique": false }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_roles_company_id",
+            "column": "company_id",
+            "references": { "table": "companies", "column": "id" },
+            "onDelete": "cascade"
+          }
+        ]
+      },
+      {
+        "name": "role_permissions",
+        "owner": "acl",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "role_id", "type": "uuid", "nullable": false },
+          { "name": "permission_id", "type": "uuid", "nullable": false },
+          { "name": "created_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_role_permissions_role_permission", "columns": ["role_id", "permission_id"], "unique": true },
+          { "name": "idx_role_permissions_permission_id", "columns": ["permission_id"], "unique": false }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_role_permissions_role_id",
+            "column": "role_id",
+            "references": { "table": "roles", "column": "id" },
+            "onDelete": "cascade"
+          },
+          {
+            "name": "fk_role_permissions_permission_id",
+            "column": "permission_id",
+            "references": { "table": "permissions", "column": "id" },
+            "onDelete": "cascade"
+          }
+        ]
+      },
+      {
+        "name": "user_role_assignments",
+        "owner": "acl",
+        "scope": "control",
+        "columns": [
+          { "name": "id", "type": "uuid", "nullable": false, "primary": true },
+          { "name": "user_id", "type": "uuid", "nullable": false },
+          { "name": "role_id", "type": "uuid", "nullable": false },
+          { "name": "assigned_by_user_id", "type": "uuid", "nullable": true },
+          { "name": "created_at", "type": "timestamptz", "nullable": false }
+        ],
+        "indexes": [
+          { "name": "ux_user_role_assignments_user_role", "columns": ["user_id", "role_id"], "unique": true },
+          { "name": "idx_user_role_assignments_role_id", "columns": ["role_id"], "unique": false }
+        ],
+        "foreignKeys": [
+          {
+            "name": "fk_user_role_assignments_user_id",
+            "column": "user_id",
+            "references": { "table": "users", "column": "id" },
+            "onDelete": "cascade"
+          },
+          {
+            "name": "fk_user_role_assignments_role_id",
+            "column": "role_id",
+            "references": { "table": "roles", "column": "id" },
+            "onDelete": "cascade"
+          },
+          {
+            "name": "fk_user_role_assignments_assigned_by_user_id",
+            "column": "assigned_by_user_id",
+            "references": { "table": "users", "column": "id" },
+            "onDelete": "set null"
+          }
+        ]
+      }
+    ],
+    "migrations": {
+      "enabled": true,
+      "runner": "embedded_sql",
+      "autoRunOnStartup": true,
+      "controlTable": "schema_migrations",
+      "namingPattern": "000001_init_acl_schema.sql",
+      "seedsSeparated": true
+    }
+  },
+  "migrations": {
+    "enabled": true,
+    "strategy": "embedded_sql",
+    "autoRunOnStartup": true
+  },
+  "docker": {
+    "enabled": true,
+    "files": ["Dockerfile", "docker-compose.yml", ".dockerignore"],
+    "services": ["api", "postgres"],
+    "appPort": 8080,
+    "requiredEnv": [
+      "APP_ENV",
+      "APP_PORT",
+      "DB_HOST",
+      "DB_PORT",
+      "DB_USER",
+      "DB_PASSWORD",
+      "DB_NAME",
+      "DB_SSLMODE",
+      "DB_AUTO_MIGRATE"
+    ],
+    "healthcheck": {
+      "type": "http",
+      "path": "/health"
+    }
+  },
+  "postman": {
+    "enabled": true,
+    "collectionStrategy": "single_project_collection",
+    "collectionGroup": "acl",
+    "environment": "local",
+    "files": [
+      "postman/base.postman_collection.json",
+      "postman/local.postman_environment.json"
+    ],
+    "variables": [
+      "baseUrl",
+      "accessToken",
+      "refreshToken",
+      "userId",
+      "companyId",
+      "resourceId"
+    ],
+    "captureAccessTokenFrom": "login",
+    "examplesPerAction": true
+  },
+  "makeTargets": [
+    "fmt",
+    "tidy",
+    "build",
+    "test",
+    "run",
+    "verify",
+    "docker-up",
+    "docker-down"
+  ],
+  "authTransport": {
+    "scheme": "Bearer",
+    "header": "Authorization"
+  },
+  "middlewareContract": {
+    "requiredForActions": [
+      "listPermissions",
+      "listRoles",
+      "createRole",
+      "getRoleById",
+      "updateRole",
+      "listRolePermissions",
+      "replaceRolePermissions",
+      "listUserRoles",
+      "assignRoleToUser",
+      "removeRoleFromUser",
+      "getUserEffectivePermissions",
+      "getMyPermissions",
+      "can"
+    ],
+    "contextValues": ["userID", "email", "permissions"],
+    "tokenValidatedIn": "http_middleware",
+    "handlersReadFrom": "fiber_locals",
+    "unauthorizedErrorCode": "UNAUTHORIZED",
+    "unauthorizedResponse": {
+      "httpStatus": 401,
+      "body": {
+        "success": false,
+        "message": "Unauthorized",
+        "error": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    }
+  },
+  "roleModel": {
+    "globalRoles": ["admin"],
+    "defaultRoleScope": "company",
+    "globalAdminSeeded": true,
+    "globalAdminReceivesAllPermissions": true,
+    "companyRolesRequireCompanyId": true,
+    "companyRoleAssignmentRequiresActiveMembership": true,
+    "effectivePermissionsDeduplicateBy": "code"
+  },
+  "examples": {
+    "requests": [
+      {
+        "action": "createRole",
+        "name": "companyRole",
+        "body": {
+          "companyId": "<company-id>",
+          "name": "Sales Manager",
+          "code": "sales_manager",
+          "description": "Manages sales workflow",
+          "scope": "company"
+        }
+      },
+      {
+        "action": "replaceRolePermissions",
+        "name": "default",
+        "body": {
+          "permissionCodes": [
+            "users.read",
+            "users.create",
+            "users.update"
+          ]
+        }
+      },
+      {
+        "action": "can",
+        "name": "default",
+        "body": {
+          "permission": "company.create",
+          "companyId": null
+        }
+      }
+    ],
+    "responses": [
+      {
+        "action": "getMyPermissions",
+        "name": "success",
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "userId": "<user-id>",
+            "companyId": "<company-id>",
+            "permissions": [
+              "users.read",
+              "users.create",
+              "company.read"
+            ]
+          }
+        }
+      },
+      {
+        "action": "can",
+        "name": "success",
+        "status": 200,
+        "body": {
+          "success": true,
+          "data": {
+            "permission": "company.create",
+            "companyId": null,
+            "can": true
+          }
+        }
+      },
+      {
+        "action": "assignRoleToUser",
+        "name": "success",
+        "status": 201,
+        "body": {
+          "success": true,
+          "data": {
+            "id": "<assignment-id>",
+            "userId": "<user-id>",
+            "roleId": "<role-id>"
+          }
+        }
+      }
+    ]
+  },
+  "permissions": [
+    "acl.permission.read",
+    "acl.role.read",
+    "acl.role.create",
+    "acl.role.update",
+    "acl.role.assign",
+    "acl.role.unassign",
+    "acl.effective-permissions.read"
+  ],
+  "fields": [
+    {
+      "name": "id",
+      "type": "uuid",
+      "primary": true,
+      "required": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "scope",
+      "type": "enum",
+      "required": true,
+      "values": ["global", "company"]
+    },
+    {
+      "name": "companyId",
+      "type": "uuid",
+      "required": false
+    },
+    {
+      "name": "permissionCodes",
+      "type": "array",
+      "required": false
+    }
+  ],
+  "actions": [
+    {
+      "name": "listPermissions",
+      "method": "GET",
+      "path": "/api/v1/acl/permissions",
+      "authRequired": true,
+      "permissions": ["acl.permission.read"]
+    },
+    {
+      "name": "listRoles",
+      "method": "GET",
+      "path": "/api/v1/acl/roles",
+      "authRequired": true,
+      "permissions": ["acl.role.read"]
+    },
+    {
+      "name": "createRole",
+      "method": "POST",
+      "path": "/api/v1/acl/roles",
+      "authRequired": true,
+      "permissions": ["acl.role.create"]
+    },
+    {
+      "name": "getRoleById",
+      "method": "GET",
+      "path": "/api/v1/acl/roles/:id",
+      "authRequired": true,
+      "permissions": ["acl.role.read"]
+    },
+    {
+      "name": "updateRole",
+      "method": "PATCH",
+      "path": "/api/v1/acl/roles/:id",
+      "authRequired": true,
+      "permissions": ["acl.role.update"]
+    },
+    {
+      "name": "listRolePermissions",
+      "method": "GET",
+      "path": "/api/v1/acl/roles/:id/permissions",
+      "authRequired": true,
+      "permissions": ["acl.role.read"]
+    },
+    {
+      "name": "replaceRolePermissions",
+      "method": "PUT",
+      "path": "/api/v1/acl/roles/:id/permissions",
+      "authRequired": true,
+      "permissions": ["acl.role.update"]
+    },
+    {
+      "name": "listUserRoles",
+      "method": "GET",
+      "path": "/api/v1/acl/users/:userId/roles",
+      "authRequired": true,
+      "permissions": ["acl.role.read"]
+    },
+    {
+      "name": "assignRoleToUser",
+      "method": "POST",
+      "path": "/api/v1/acl/users/:userId/roles",
+      "authRequired": true,
+      "permissions": ["acl.role.assign"]
+    },
+    {
+      "name": "removeRoleFromUser",
+      "method": "DELETE",
+      "path": "/api/v1/acl/users/:userId/roles/:assignmentId",
+      "authRequired": true,
+      "permissions": ["acl.role.unassign"]
+    },
+    {
+      "name": "getUserEffectivePermissions",
+      "method": "GET",
+      "path": "/api/v1/acl/users/:userId/effective-permissions",
+      "authRequired": true,
+      "permissions": ["acl.effective-permissions.read"]
+    },
+    {
+      "name": "getMyPermissions",
+      "method": "GET",
+      "path": "/api/v1/acl/me/permissions",
+      "authRequired": true,
+      "permissions": []
+    },
+    {
+      "name": "can",
+      "method": "POST",
+      "path": "/api/v1/acl/can",
+      "authRequired": true,
+      "permissions": []
+    }
+  ],
+  "rules": [
+    "permissions are identified by stable codes such as company.create and users.read",
+    "the global admin role must be seeded by default",
+    "the global admin role must contain every permission in the catalog",
+    "only users with effective permission company.create can create companies",
+    "company.create is a global permission and is evaluated without company context",
+    "company.create should be granted only through the global admin role by default",
+    "roles are company-scoped by default",
+    "only the admin role is global by default",
+    "role code must be unique globally for global roles and unique per company for company-scoped roles",
+    "company-scoped roles require company_id",
+    "company-scoped role assignment requires active membership in the same company",
+    "effective permissions are resolved as the union of permissions across assigned roles",
+    "effective permission listing must deduplicate repeated permissions by code",
+    "can returns a boolean for the current authenticated user and permission code"
+  ],
+  "tables": [
+    "permissions",
+    "roles",
+    "role_permissions",
+    "user_role_assignments"
+  ],
+  "dependencies": [
+    "users",
+    "companies",
+    "company_users",
+    "auth middleware",
+    "audit logger"
+  ],
+  "errors": [
+    { "code": "PERMISSION_NOT_FOUND", "httpStatus": 404 },
+    { "code": "ROLE_NOT_FOUND", "httpStatus": 404 },
+    { "code": "ROLE_ASSIGNMENT_NOT_FOUND", "httpStatus": 404 },
+    { "code": "ROLE_CODE_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "PERMISSION_CODE_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "ROLE_ASSIGNMENT_ALREADY_EXISTS", "httpStatus": 409 },
+    { "code": "INVALID_ROLE_SCOPE", "httpStatus": 422 },
+    { "code": "INVALID_COMPANY_ROLE_ASSIGNMENT", "httpStatus": 422 },
+    { "code": "FORBIDDEN", "httpStatus": 403 },
+    { "code": "VALIDATION_ERROR", "httpStatus": 400 },
+    { "code": "UNAUTHORIZED", "httpStatus": 401 }
+  ],
+  "auditEvents": [
+    "permission_seeded",
+    "role_created",
+    "role_updated",
+    "role_permissions_replaced",
+    "role_assigned_to_user",
+    "role_removed_from_user",
+    "effective_permissions_resolved",
+    "can_checked"
+  ],
+  "ui": {
+    "pages": [
+      "permissions",
+      "roles",
+      "role-detail",
+      "user-roles"
+    ]
+  }
+}
